@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+  <!-- vertex property keys -->
+  <key id="name" for="node" attr.name="name" attr.type="string" />
+  <key id="eval" for="node" attr.name="eval" attr.type="string" />
+
+  <!-- edge property keys -->
+  <key id="pos" for="node" attr.name="pos" attr.type="vector_float" />
+  <key id="weight" for="edge" attr.name="weight" attr.type="double" />
+
+  <graph id="G" edgedefault="directed">
+
+   <!-- graph properties -->
+
+   <!-- vertices -->
+   <node id="c0">
+	   <data key="name">Client:A</data>
+	   <data key="eval">Client.Client(s)</data>
+   </node>
+   <node id="c1">
+	   <data key="name">Client:B</data>
+   </node>
+
+   <node id="c2">
+	   <data key="name">Client:C</data>
+   </node>
+
+   <node id="c3">
+	   <data key="name">Client:D</data>
+   </node>
+
+
+
+
+   <node id="nodeswitch">
+	   <data key="name">Switch:NodeSwitch</data>
+   </node>
+   <node id="io0">
+	   <data key="name">I/O:A</data>
+	   <data key="eval">IOServer.IOServer(s)</data>
+   </node>
+
+   <node id="io1">
+	   <data key="name">I/O:B</data>
+	   <data key="eval">IOServer.IOServer(s)</data>
+   </node>
+
+   <node id="ca0">
+	   <data key="name">Cache</data>
+   </node>
+   <node id="st">
+	   <data key="name">Switch</data>
+   </node>
+   <node id="cag">
+	   <data key="name">Disk Cache</data>
+	   <data key="eval">Cache.Cache(s)</data>
+   </node>
+   <node id="d0">
+	   <data key="name">Drive:A</data>
+   </node>
+   <node id="d1">
+	   <data key="name">Drive:B</data>
+   </node>
+
+   <node id="d2">
+	   <data key="name">Drive:C</data>
+   </node>
+<!--
+   <node id="lib">
+	   <data key="name">Library</data>
+	   <data key="eval">Library.Library(s, 5,5)</data>
+   </node>
+-->
+
+
+
+   <!-- edges -->
+    <edge id="e0" source="c0" target="nodeswitch">
+		<data key="weight">10</data>
+    </edge>
+
+    <edge id="e1" source="c1" target="nodeswitch">
+		<data key="weight">10</data>
+    </edge>
+
+    <edge id="e1" source="c2" target="nodeswitch">
+		<data key="weight">10</data>
+    </edge>
+
+    <edge id="e1" source="c3" target="nodeswitch">
+		<data key="weight">10</data>
+    </edge>
+
+    <edge id="e2" source="io0" target="nodeswitch">
+		<data key="weight">7.0</data>
+    </edge>
+
+    <edge id="e212" source="io1" target="nodeswitch">
+		<data key="weight">7.0</data>
+    </edge>
+
+
+    <edge id="e3" source="cag" target="nodeswitch">
+		<data key="weight">20.0</data>
+    </edge>
+
+
+
+    <edge id="e3" source="io0" target="st">
+		<data key="weight">30.0</data>
+    </edge>
+
+
+    <edge id="e4" source="io1" target="st">
+		<data key="weight">30.0</data>
+    </edge>
+
+    <edge id="e5" source="io0" target="ca0">
+      <data key="weight">20.0</data>
+    </edge>
+
+    <edge id="e6" source="d0" target="st">
+      <data key="weight">5.0</data>
+    </edge>
+    <edge id="e7" source="d1" target="st">
+      <data key="weight">5.0</data>
+    </edge>
+    <edge id="e6" source="d2" target="st">
+      <data key="weight">5.0</data>
+    </edge>
+
+
+  </graph>
+</graphml>

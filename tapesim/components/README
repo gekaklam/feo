@@ -1,0 +1,3 @@
+The simulator owes it's flexibility to arbitrary system setups to the use of 
+components. A components abstracts any layer of indirection and thus is 
+responsible for the correct book keeping during the simulation.
