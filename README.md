@@ -11,6 +11,10 @@ graph functions).
 
 ### Compiling graph-tool from source
 
+Unfortunetly graph-tool can not be installed using pip but needs to be compiled
+from source. For Fedora all requirements for graph-tool can be satisfied by
+by installing the following:
+
 	sudo dnf install CGAL CGAL-devel cairomm cairomm-devel pycairo pycairo-devel sparsehash-devel boost boost-python3 boost-python3-devel
 	sudo pip3 install numpy scipy
 
