@@ -1,0 +1,16 @@
+@startuml
+skinparam shadowing false
+skinparam monochrome true
+
+== Phase 1 ==
+Client -> "I/O Server": send(file)
+"I/O Server" -> "Shared Cache": write(file)
+Client <- "I/O Server": OK
+
+... asyncronous ...
+
+== Phase 2 ==
+"Shared Cache" -> "I/O Server": read(file)
+"I/O Server" -> Library: write(file)
+
+@enduml

@@ -1,0 +1,53 @@
+graph G {
+	node [fontname = "Arial"];
+	edge [fontname = "Arial", fontsize = 12];
+
+	graph[rankdir=LR]
+
+
+	x1 [label="", shape=circle, width=0.2]
+	x2 [label="Elevator, 10 sec", shape=rect, width=0.2]
+
+
+	r [label="Robot", shape=invhouse, fontsize=10, style="filled", fontcolor="white", fillcolor="black", width=0.5]
+	r -- x1[label="5m/s", style=dotted]
+
+	d1 [label="Drive 1", shape=rect]
+	d2 [label="Drive 2", shape=rect]
+	d3 [label="...", shape=rect, width=0.85]
+
+	d1 -- x1 [label="20 cm"]
+	d2 -- x1 [label="3 sec"]
+	d3 -- x1 
+
+
+
+
+	c1 [label="Slots 1", shape=rect]
+	c2 [label="Slots 2", shape=rect]
+	c3 [label="...", shape=rect]
+	x1 -- c1 [label="50cm"]
+	c1 -- c2 [label="20cm"]
+	c2 -- c3 [label="get_distance()"]
+
+
+
+	c11 [label="Slots -1", shape=rect]
+	c22 [label="Slots -2", shape=rect]
+	c33 [label="...", shape=rect]
+	x1 -- c11 [label="4 sec"]
+	c11 -- c22 [label="3 sec"]
+	c22 -- c33 [label="get_time()"]
+
+
+
+	c3 -- x2
+	c33 -- x2
+
+
+
+
+
+	
+}
+

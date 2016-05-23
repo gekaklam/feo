@@ -1,0 +1,117 @@
+@startuml
+skinparam shadowing false
+skinparam monochrome true
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Core
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+package Core {
+	class Simulation {
+	-modeltime
+	' #field2
+	' ~method1()
+	+now()
+	+register_event()
+	}
+
+	class Component {
+	-simulation
+	+next_action()
+	}
+}
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Convienience
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+package Convienience {
+	class PersistencyManager() {
+	-snapshot_directory
+	+ensure_subdir(name)
+	+ensure_file(name)
+	}
+
+	class Log/ReportManager() {
+	-reports
+	+register_report(name, fields)
+	+append_row(report, dic)
+	}
+}
+
+
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Topologies
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+class NetworkTopology {
+ -graph
+ +init_from_xml()
+ +register_component()
+ +maximum_flow(src, tgt)
+ +allocate/free(flow)
+}
+
+class LibraryTopology {
+ -graph
+ +init_from_xml()
+ +register_component()
+ +shortest_path(src, tgt)
+}
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Components
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+class NetworkComponent {
+ -NetworkTopology
+ -VertexID
+ +has_capacity()
+}
+
+class LibraryComponent {
+ -LibraryTopology
+ -VertexID 
+ +ready/has_capacity()
+ +position()
+}
+
+class SoftwareComponent
+
+Component <|-- NetworkComponent
+Component <|-- LibraryComponent
+Component <|-- SoftwareComponent
+
+
+
+NetworkComponent <|-- Client
+NetworkComponent <|-- "IO Server"
+NetworkComponent <|-- Drive
+LibraryComponent <|-- Drive
+LibraryComponent <|-- Tape
+LibraryComponent <|-- Robot
+
+
+SoftwareComponent <|-- "File/Tape/CacheManager"
+SoftwareComponent <|-- "IO/DriveScheduler"
+SoftwareComponent <|-- "RobotScheduler"
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Datetypes
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+	class Request {
+	-simulation
+	-status
+	-
+	+init(sim, type, file, size)
+	+next_action()
+	}
+
+
+
+
+
+
+@enduml

@@ -1,0 +1,26 @@
+@startuml
+skinparam shadowing false
+skinparam monochrome true
+
+Client -> "I/O Server": request(file)
+
+"I/O Server" -> "Shared Cache": is_staged(file)
+"I/O Server" <- "Shared Cache": True/False
+
+group File is not staged/cached.
+	"I/O Server" --> Library: order_stage(file)
+	Library --> "Shared Cache": write(file)    
+
+end
+
+' "I/O Server" -> "Shared Cache": is_staged(file)
+' "I/O Server" --> Library: stage(file)
+' Library --> "Shared Cache": write(file)
+
+"I/O Server" -> "Shared Cache": read(file)
+
+Client <- "I/O Server": serve(file)
+
+
+
+@enduml
