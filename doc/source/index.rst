@@ -3,13 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to TapeSim's documentation!
-===================================
+Feo: Tape Library Simulator
+==========================
 
-holy moly
-coly foly
+Feo, as a reference to iron oxide (here Fe2O3) which is commonly used in magnetic tape media, allows to simulate automated tape libraries systems integrated into the storage hierarchy of modern data centers.
 
-
+The system is modularized to relfect the various physical and software based components found in actual storage systems for two reasons: 1) to accurately resemble the paths data flows in actual systems 2) to allow to operate and manage actual enterprise tape systems once in a matured state.
 
 
 .. toctree::
@@ -19,19 +18,18 @@ coly foly
 
 
 
-Components
+Table of Contents
 ----------
+
+- :doc:`how-to-simulate`
+- :doc:`how-to-create-reports`
 
 - :doc:`components`
 
 
-Here is something I want to talk about::
 
-    def my_fn(foo, bar=True):
-        """A really useful function.
 
-        Returns None
-        """
+
 
 .. automodule:: tapesim
 
@@ -39,7 +37,7 @@ Here is something I want to talk about::
     :members:
 
 Indices and tables
-d==================
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`
