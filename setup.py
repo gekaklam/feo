@@ -16,22 +16,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# This file mostly metadata to describe this python package.
+
+import os
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
+# allow setup.py to be run from any path
+os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
+
+# package metadata
 config = {
+    'name': 'feo-tape-library-simulation',
+    'version': '0.1',
+    #'packages': ['tapesim'],
+    'packages': find_packages(),
     'description': 'A tape library simulation',
     'author': 'Jakob Luettgau',
-    'url': '',
+    'url': 'https://github.com/jakobluettgau/feo',
     'download_url': '',
     'author_email': 'luettgau@dkrz.de',
-    'version': '0.1',
     'install_requires': ['nose'],
-    'packages': ['NAME'],
     'scripts': [],
-    'name': ''
+    'zip_safe': False,
 }
 
 setup(**config)
