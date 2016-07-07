@@ -29,7 +29,7 @@ from source. E.g. on Fedora all requirements for graph-tool can be installed
 as follows:
 
 	sudo dnf install CGAL CGAL-devel cairomm cairomm-devel pycairo pycairo-devel sparsehash-devel boost boost-python3 boost-python3-devel
-	sudo pip3 install numpy scipy
+	sudo pip3 install numpy scipy matplotlib
 
 Build and install using the following instructions:
 

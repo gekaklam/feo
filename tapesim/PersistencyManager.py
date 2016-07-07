@@ -42,6 +42,7 @@ class PersistencyManager(object):
         # create directory structure
         if not os.path.exists(self.path):
             os.makedirs(self.path)
+            os.makedirs(self.path + "/visualizations")
             os.makedirs(self.path + "/requests")
             os.makedirs(self.path + "/reports")
             os.makedirs(self.path + "/library_state/")
