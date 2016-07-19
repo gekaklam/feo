@@ -28,11 +28,11 @@ import pprint
 import datetime
 import time
 
-import ProviderXferlog
-import RebuildFilesystem
+import tapesim.workloads.ProviderXferlog as ProviderXferlog
+import tapesim.workloads.RebuildFilesystem as RebuildFilesystem
 
 # simulation and reporting facilities
-import tapesim.Simulation as Simulation
+import tapesim.kernels.Simulation as Simulation
 import tapesim.Topology as Topology
 
 # import datatypes required used in this simulation

@@ -10,6 +10,12 @@ import pprint
 import datetime
 import time
 
+
+# in case tapesim was not yet installed
+sys.path.insert(0,'..')
+
+print(sys.path)
+
 # simulation and reporting facilities
 import tapesim.Simulation as Simulation
 import tapesim.Topology as Topology
@@ -51,7 +57,7 @@ from numpy.random import poisson
 #print("---")
 ###############################################################################
 
-g = gt.load_graph("configs/network.xml")
+g = gt.load_graph("../data/configs/network.xml")
 
 
 edges = []

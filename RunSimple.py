@@ -28,7 +28,7 @@ import time
 
 
 # simulation and reporting facilities
-import tapesim.Simulation as Simulation
+import tapesim.kernels.Simulation as Simulation
 import tapesim.Topology as Topology
 import tapesim.Report as Report
 
