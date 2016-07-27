@@ -49,6 +49,13 @@ class BackupManager(object):
         #                         SmtwtfsSmtwtfsSmtwtfsSmtwtfsSmtwtfsSmtwtfsSmtwtfsSmtwtfsSmtwtfsS
         self.strategy_sequence = "fddddddcddddddcddddddcdddddd" # full every month, cummulative weekly, incremental in between
 
+        
+        self.backup_targets = []
+        self.backup_servers = []
+        self.backup_clients = []
+
+
+        self.backup_catalogue = []
 
 
         pass

@@ -13,7 +13,15 @@ import tapesim.datatypes.Request as Request
 
 
 class ProviderXferlog(object):
+    """ """
+    #  0  1   2    3     4        5                  6                      7        8
+    #  wd mon      time  year     host               file                   type     bytes
+    # Tue Dec 1 00:01:11 2015 10.50.35.16 2100_ten/2084/208404_qtimer.tar PSTO_Cmd 14643200
+
+
+
     def __init__(self, simulation, tracefile, limit=None):
+
 
         self.simulation = simulation
 
@@ -28,9 +36,6 @@ class ProviderXferlog(object):
         self.size_max = 0
         self.sizes = []
 
-        #  0   1  2     3     4        5                   6                     7        8
-        #  wd mon      time  year     host               file                   type     bytes
-        # Tue Dec 1 00:01:11 2015 10.50.35.16 2100_ten/2084/208404_qtimer.tar PSTO_Cmd 14643200
 
         #selt.fh = open(filepath, "r")
         self.tracefile = tracefile
@@ -72,7 +77,14 @@ class ProviderXferlog(object):
 
 
     def fetch_one(self):
+            
+        # Template to parse xferlog entry:
+        #  0  1   2    3     4        5                  6                      7        8
+        #  wd mon      time  year     host               file                   type     bytes
+        # Tue Dec 1 00:01:11 2015 10.50.35.16 2100_ten/2084/208404_qtimer.tar PSTO_Cmd 14643200
+
         DATE_FORMAT = "%b %d %H:%M:%S %Y"
+
 
         line = self.tracefile.readline()
         if line == '' or (self.limit != None and self.counter >= self.limit):
@@ -99,8 +111,7 @@ class ProviderXferlog(object):
         clienthost = "%s" % (random.randint(1,10))
 
         if clienthost not in self.hosts.keys():
-
-            print("NOT!!")
+            print("Client not present.")
 
             new_client = self.simulation.topology.register_network_component(name=clienthost, link_capacity=1000)
             self.hosts[clienthost] = new_client
