@@ -32,8 +32,8 @@ import tapesim.workloads.ProviderXferlog as ProviderXferlog
 import tapesim.workloads.RebuildFilesystem as RebuildFilesystem
 
 # simulation and reporting facilities
-import tapesim.kernels.Simulation as Simulation
-#import tapesim.kernels.ChainedRequestQueues as Simulation
+#import tapesim.kernels.Simulation as Simulation
+import tapesim.kernels.ChainedRequestQueues as Simulation
 import tapesim.Topology as Topology
 
 # import datatypes required used in this simulation
@@ -66,9 +66,6 @@ def main():
     print("== Configuration ==")
     # maybe some environment variables?
     # print(os.environ['TAPESIM_'])
-
-
-
 
 
     parser = argparse.ArgumentParser(description='Simulating Tape Storage Libraries/Silos')
@@ -141,7 +138,7 @@ def main():
     print("Tapes:", len(sim.tm.tapes))
     #pprint.pprint(sim.tm.tapes)
 
-    # set trace file and register as provider
+    # Open tracefile and register provider
     trace = ProviderXferlog.ProviderXferlog(sim, args.tracefile, limit=limit)
     sim.provider.append(trace)
 
@@ -168,22 +165,70 @@ def main():
     
     # add a number of tape drives
     #for i in range(1,65):
-    for i in range(0,drives):
-        drivename = "Drive %d" % i
+    print()
+    print("================================================================================================")
+    print("== Install Components ==========================================================================")
+    print("================================================================================================")
+
+    drives = [
+			# IBM-LTO4:
+			{"type": "LTO-4", "mode": "rw", "position": (0,10,1,0)},
+			{"type": "LTO-4", "mode": "rw", "position": (0,10,1,3)},
+			{"type": "LTO-4", "mode": "rw", "position": (0,11,1,0)},
+			{"type": "LTO-4", "mode": "rw", "position": (0,11,1,3)},
+
+			{"type": "LTO-4", "mode": "w", "position": (2,2,1,0)},
+			{"type": "LTO-4", "mode": "w", "position": (2,2,1,3)},
+			{"type": "LTO-4", "mode": "w", "position": (2,2,1,15)},
+
+			# IBM-LTO5:
+			{"type": "LTO-5", "mode": "rw", "position": (0,5,1,1)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,5,1,2)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,5,1,13)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,6,1,0)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,6,1,4)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,6,1,8)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,6,1,12)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,7,1,6)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,7,1,7)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,7,1,11)},
+
+			# IBM-LTO6:
+			{"type": "LTO-6", "mode": "rw", "position": (1,1,1,4)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,1,1,8)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,1,1,12)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,2,1,8)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,2,1,12)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,3,1,4)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,3,1,8)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,3,1,12)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,5,1,4)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,6,1,4)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,6,1,8)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,7,1,4)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,7,1,8)},
+
+			{"type": "LTO-6", "mode": "w", "position": (2,3,1,14)},
+			{"type": "LTO-6", "mode": "w", "position": (2,3,1,15)},
+    ]
+
+    for i,d  in enumerate(drives):
+        drivename = "%s Drive %d" % (d["type"], i)
         new_drive = sim.topology.register_network_component(name=drivename, link_capacity=100, drive=True)
-        print("drives")
 
 
     # start the simulation
     print()
+    print("================================================================================================")
     print("== Start Simulation ============================================================================")
-    print("== Start Simulation ============================================================================")
-    print("== Start Simulation ============================================================================")
+    print("================================================================================================")
     sim.start()
 
     # Setup up report
     print()
-    print("== Report ==")
+    print("================================================================================================")
+    print("== Report ========= ============================================================================")
+    print("================================================================================================")
     #r.write_requests(s.finished)
 
     # only needed to test signal handler

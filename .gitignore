@@ -1,2 +1,8 @@
 
 tmp/*
+
+tools/lib/*
+
+
+
+*.pyc

@@ -17,8 +17,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-
 import tapesim.components.Component
+
+
+
+def travel_time_easing(distance, max_velocity, accelleration, decceleration=None):
+    """ 
+        trapezoid equation
+
+
+    """
+    if decceleration is None:
+        decceleration = accelleration
+
+    total_time = 0.5 * (max_velocity/
+
 
 class DriveGroup(object):
     """
@@ -77,12 +90,56 @@ class StorageTekSL8500(tapesim.components.Component.Component):
         super().__init__(simulation=simulation)
 
         self.levels = 4
-        self.sems   = num_sems
+
+        # SL8500 systems are purchased
+        self.num_sems   = num_sems
+
+        # calculate number of useable slots
+        num_slots_outer = 13 * 4 * 2 * (3 + self.num_sems * 8 + 2 + 3) 
+        num_slots_inner = 13 * 4 * 2 * (3 + self.num_sems * 8 + 2)
+        self.num_slots = num_slots_inner + num_slots_outer
 
         pass
 
 
+    def install_drive(self):
+        pass
+
+
+    def get_slot_xy(self, row, column):
+        """ Resolve a slot address to cm coordinates """
+        slot_width = 10
+        slot_height = 2
+
+        offset_x = 2 * slot_width
+        offset_y = 0
+ 
+        # account for Sl8500 ommited slots?
+        #if row > 1:
+        #    offset_y += 1
+   
+        #if row > 11:
+        #    offset_y += 1 
+
+        x = offset_x + slot_width * column - (slot_width/2)
+        y = offset_y + slot_height * row   - (slot_height/2)
+        return (x, y)
+      
+    def get_slot_xy(self, row, column):
+        """ Resolve a drive address to cm coordinates """
+        drive_width = 10
+        drive_height = 6
+        drive_spacing = 2
+
+        offset_x = 2 * drive_width
+        offset_y = 0
+
+        x = offset_x + drive_width * column                 - (drive_width/2)
+        y = offset_y + (drive_height + drive_spacing) * row - (drive_height/2) - drive_spacing
+        return (x, y)
+
 
     def get_nearest_slot(self, free=True, fill_level=None):
         return []
-    
+   
+

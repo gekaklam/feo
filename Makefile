@@ -21,3 +21,8 @@ install:
 clean:
 	rm -rf dist
 	rm -rf feo_tape_library_simulation.egg-info
+
+
+clean-pyc:
+	@echo TODO
+	find tapesim -name "*.pyc" | xargs rm
