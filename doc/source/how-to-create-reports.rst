@@ -6,8 +6,7 @@
 How Create Reports
 ==================
 
-
-
+FEO was developed to provide insight into hierarchical storage systems 
 
 
 
@@ -20,13 +19,7 @@ Contents:
 Generics
 ========
 
-.. autoclass:: tapesim.components.Drive.Drive
-    :members:
-    :inherited-members:
-
-.. autoclass:: tapesim.components.IOServer.IOServer
-    :members:
-    :inherited-members:
+.. autoclass:: tapesim.
 
 
 Commercial

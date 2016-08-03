@@ -11,9 +11,9 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="300mm"
-   height="300mm"
-   viewBox="0 0 1062.9921 1062.9921"
+   width="250.00009mm"
+   height="69.693527mm"
+   viewBox="0 0 885.82707 246.94556"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -99,16 +99,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.36076876"
-     inkscape:cx="375.44018"
-     inkscape:cy="997.56808"
+     inkscape:cx="269.14098"
+     inkscape:cy="210.95468"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1680"
-     inkscape:window-height="986"
-     inkscape:window-x="1366"
-     inkscape:window-y="27"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1196"
+     inkscape:window-height="613"
+     inkscape:window-x="1920"
+     inkscape:window-y="1286"
+     inkscape:window-maximized="0"
      inkscape:snap-bbox="true"
      inkscape:snap-bbox-edge-midpoints="true"
      inkscape:snap-bbox-midpoints="false"
@@ -119,10 +119,16 @@
      inkscape:snap-nodes="true"
      inkscape:snap-others="false"
      inkscape:bbox-nodes="true"
-     inkscape:snap-global="true">
+     inkscape:snap-global="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
     <inkscape:grid
        type="xygrid"
-       id="grid4136" />
+       id="grid4136"
+       originx="-106.2992"
+       originy="-786.61336" />
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -132,7 +138,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -140,7 +146,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,10.629921)">
+     transform="translate(-106.2992,-18.803238)">
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:3.375;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 655.51186,88.582678 0,35.433072"
@@ -170,7 +176,8 @@
        height="140.5869"
        x="106.87189"
        y="60.808907"
-       ry="21.088034" />
+       ry="21.088034"
+       rx="21.088034" />
     <circle
        style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path4171"
@@ -229,7 +236,8 @@
          height="34.450481"
          width="140.74968"
          id="rect4165-1-2-8-4-7"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.98261338;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.98261338;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="10.335146" />
       <text
          sodipodi:linespacing="125%"
          id="text4313-8-9"
@@ -244,13 +252,14 @@
            sodipodi:role="line">Tape Drive</tspan></text>
     </g>
     <rect
-       style="fill:url(#pattern4499);fill-opacity:1.0;stroke:#000000;stroke-width:0.97440945;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:url(#pattern4499);fill-opacity:1;stroke:#000000;stroke-width:0.97440946;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect4165-1-2-2-0"
        width="211.62469"
        height="140.63338"
        x="780.0144"
        y="96.281319"
-       ry="8.4380016" />
+       ry="8.4380016"
+       rx="8.4380016" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:20px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
@@ -303,7 +312,8 @@
          height="34.580982"
          width="105.44711"
          id="rect4165-1-2-8-4-7-9-9"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.85211325;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.85211325;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="10.374296" />
       <text
          sodipodi:linespacing="125%"
          id="text4313-8-9-2-3"
@@ -378,7 +388,8 @@
          height="34.580982"
          width="105.44711"
          id="rect4165-1-2-8-4-7-9"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.85211325;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.85211325;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         rx="10.374296" />
       <text
          sodipodi:linespacing="125%"
          id="text4313-8-9-2"

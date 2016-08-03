@@ -80,7 +80,13 @@ class Simulation(object):
         # Simulation Event Provider
         self.provider = []
         self.provider_batch_limit = 10
-        self.rids = 0 # request IDs
+        self.rids = 0 # request IDs    def process_read(self, request):
+        pass
+
+    def process_write(self, request):
+        pass
+
+
 
         # Analysis and reporting helpers
         self.persistency = PersistencyManager.PersistencyManager() 
@@ -101,6 +107,8 @@ class Simulation(object):
         self.disk_dirty = []
         self.tapeIO = []
         self.robots = []
+
+        self.network = []
 
 
         # Various tape related controller and management facilities
@@ -136,13 +144,16 @@ class Simulation(object):
     def step(self):
         print("Simulation.step()")
 
+
+
+
         # Fetch new events from available providers
         if len(self.IN) < self.provider_batch_limit:
             for provider in self.provider:
                 provider.fetch_batch(self.provider_batch_limit-len(self.IN))
         
 
-        if unfinished <= 0: 
+        if self.IN <= 0: 
             print("Simulation halted. Nothing to do.")
             self.halted = True
         elif self.iteration >= self.max_iterations and self.max_iterations not in ['inf', -1, None]:
@@ -157,26 +168,6 @@ class Simulation(object):
 
 
         pass
-
-    def process_read(self, request):
-        pass
-
-    def process_write(self, request):
-        pass
-
-
-    def process_incoming(self):
-        """docstring for process_incoming"""
-        pass
-   
-
-    def process_waiting(self, waiting=[]):
-        """
-        @param waiting  a list of waiting requests from other processing steps
-
-        """
-        pass
-
 
 
     def process(self):

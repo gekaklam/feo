@@ -23,14 +23,35 @@ import tapesim.components.Component
 
 def travel_time_easing(distance, max_velocity, accelleration, decceleration=None):
     """ 
-        trapezoid equation
+        distance        m
+        max_velocity    m/s
+        accelleration   m/s/s
+        decelleration   m/s/s
 
+        trapezoid equation to account for accelleration
+
+           +-----------------+
+          /|                 |\
+         / |                 | \
+        +--+-----------------+--+
+
+         accelleration phase
+        <-->                 <-->
+                              decceleration phase
+
+        <----------------------->
+           total distance/time
 
     """
     if decceleration is None:
         decceleration = accelleration
 
-    total_time = 0.5 * (max_velocity/
+
+
+
+    time_max = (distance - distace_acc - distance_decc) / max_velocity
+
+    total_time = time_acc + time_dec + time_max
 
 
 class DriveGroup(object):

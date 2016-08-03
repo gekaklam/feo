@@ -19,10 +19,13 @@ install:
 
 
 clean:
+	rm -rf build
+
 	rm -rf dist
 	rm -rf feo_tape_library_simulation.egg-info
 
 
 clean-pyc:
+	# use to remove any *.pyc files which may be created during development
 	@echo TODO
 	find tapesim -name "*.pyc" | xargs rm

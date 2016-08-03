@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Feo: Tape Library Simulator
-==========================
+===========================
 
 Feo, as a reference to iron oxide (here Fe2O3) which is commonly used in magnetic tape media, allows to simulate automated tape libraries systems integrated into the storage hierarchy of modern data centers.
 
@@ -19,12 +19,12 @@ The system is modularized to relfect the various physical and software based com
 
 
 Table of Contents
-----------
+-----------------
 
 - :doc:`how-to-simulate`
 - :doc:`how-to-create-reports`
-
 - :doc:`components`
+- :doc:`CRQ`
 
 
 
@@ -33,7 +33,7 @@ Table of Contents
 
 .. automodule:: tapesim
 
-.. autoclass:: tapesim.Simulation.Simulation
+.. autoclass:: tapesim.kernels.Simulation
     :members:
 
 Indices and tables
