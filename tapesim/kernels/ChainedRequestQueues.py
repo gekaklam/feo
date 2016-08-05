@@ -58,6 +58,23 @@ class Simulation(object):
     """ This simulation implements a chained request queues model to simulate
     a hierarchical tape archive with a variable disk based cache. """
 
+    # Managing installed components and how they relate using a topology
+    topology = None
+    components = []  # To query component states
+    clients = []     # clients
+    servers = []     # I/O servers
+    drives  = []     # drives
+
+    # Queues
+    IN = []
+    OUT = []
+    
+    diskIO = []
+    disk_dirty = []
+    tapeIO = []
+    robots = []
+
+    network = []
 
     def __init__(self,
             starting_time=datetime.datetime(1,1,1, microsecond=0),
@@ -81,34 +98,12 @@ class Simulation(object):
         self.provider = []
         self.provider_batch_limit = 10
         self.rids = 0 # request IDs    def process_read(self, request):
-        pass
-
-    def process_write(self, request):
-        pass
-
-
 
         # Analysis and reporting helpers
         self.persistency = PersistencyManager.PersistencyManager() 
         self.report = Report.Report(self)
 
-        # Managing installed components and how they relate using a topology
-        self.topology = None
-        self.components = []  # To query component states
-        self.clients = []     # clients
-        self.servers = []     # I/O servers
-        self.drives  = []     # drives
 
-        # Queues
-        self.IN = []
-        self.OUT = []
-        
-        self.diskIO = []
-        self.disk_dirty = []
-        self.tapeIO = []
-        self.robots = []
-
-        self.network = []
 
 
         # Various tape related controller and management facilities
@@ -143,9 +138,6 @@ class Simulation(object):
 
     def step(self):
         print("Simulation.step()")
-
-
-
 
         # Fetch new events from available providers
         if len(self.IN) < self.provider_batch_limit:

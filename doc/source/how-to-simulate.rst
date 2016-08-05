@@ -15,8 +15,7 @@ overview how to run or adapt a existing simulation for
 
 Contents:
 
-.. toctree::
-   :maxdepth: 2
+.. contents::
 
 
 

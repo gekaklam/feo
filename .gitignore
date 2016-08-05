@@ -4,5 +4,9 @@ tmp/*
 tools/lib/*
 
 
+examples/snapshots/*
+examples/visualisation/*
+examples/visualization/*
+
 
 *.pyc

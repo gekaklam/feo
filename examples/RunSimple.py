@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015 Jakob Luettgau
@@ -25,6 +26,9 @@ import argparse
 import pprint
 import datetime
 import time
+
+# add parent directy as python path to allow examples to work without installing
+sys.path.insert(0, "../")
 
 
 # simulation and reporting facilities
@@ -82,7 +86,7 @@ def main():
     print("== Prepare Topology ==")
     # load a topology from xml
     #t = Topology.Topology(s, network_xml='configs/network.xml') 
-    t = Topology.Topology(s, network_xml='configs/network_IOServers.xml') 
+    t = Topology.Topology(s, network_xml='../data/configs/network_IOServers.xml') 
     s.topology = t
 
 #    client1 = Client.Client(s)

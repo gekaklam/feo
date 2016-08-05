@@ -18,15 +18,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import sys
 import os
 import signal
-import sys
 import argparse
 import pprint
 
 import pprint
 import datetime
 import time
+
+# add parent directy as python path to allow examples to work without installing
+sys.path.insert(0, "../")
+
 
 import tapesim.workloads.ProviderXferlog as ProviderXferlog
 import tapesim.workloads.RebuildFilesystem as RebuildFilesystem
@@ -73,16 +77,12 @@ def main():
     #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512.out")
     #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512_ALTERED-FOR-TESTING-SHORT.out")
     #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512_ALTERED-FOR-TESTING.out")
-    parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="data/traces/dummy.xferlog")
-    parser.add_argument('--networktopoloy', default="data/configs/DKRZ.xml")
-    parser.add_argument('--librarytopoloy', default="data/configs/library_DKRZ.xml")
-
-    
+    parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../data/traces/dummy.xferlog")
+    parser.add_argument('--networktopoloy', default="../data/configs/DKRZ.xml")
+    parser.add_argument('--librarytopoloy', default="../data/configs/library_DKRZ.xml")
 
     parser.add_argument('--limit', type=int, help='')
     parser.add_argument('--drives', type=int, help='')
-
-
     parser.add_argument('--config', type=int, help='')
     #parser.add_argument('--snapshot', help='')
 
@@ -95,11 +95,13 @@ def main():
 
     # Setup simulation
     print("")
-    print("== Init Simulation ==")
-    #sim = Simulation.Simulation(max_iterations=-1, confirm_step=True)
+    print("== Initiate Simulation ==")
     sim = Simulation.Simulation(max_iterations=-1)
+    #sim = Simulation.Simulation(max_iterations=-1, confirm_step=True)
     #sim = Simulation.Simulation(max_iterations=-1, keep_finished=True, confirm_step=True)
 
+
+    ###########################################################################
     # Register Components and connect
     print("")
     print("== Prepare Topology ==")
@@ -107,7 +109,6 @@ def main():
     #t = Topology.Topology(s, network_xml='configs/network.xml') 
     t = Topology.Topology(sim, network_xml=args.networktopoloy) 
     sim.topology = t 
-
 
 
     limit = None

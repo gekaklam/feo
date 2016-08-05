@@ -19,12 +19,10 @@ Contents:
 Generics
 ========
 
-.. autoclass:: tapesim.
+.. autoclass:: tapesim.Report.Report
+    :members:
+    :inherited-members:
 
-
-Commercial
-==========
-
-.. autoclass:: tapesim.components.StorageTekSL8500.StorageTekSL8500
-
-
+.. autoclass:: tapesim.PersistencyManager.PersistencyManager
+    :members:
+    :inherited-members:
