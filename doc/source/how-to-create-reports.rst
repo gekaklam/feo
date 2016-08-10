@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-How Create Reports
-==================
+Getting Started: Creating Reports
+=================================
 
 FEO was developed to provide insight into hierarchical storage systems 
 

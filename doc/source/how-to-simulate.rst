@@ -3,17 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-How to Run Simulations
-======================
+Getting Started: Running a Simulation
+=====================================
 
 The quickest way to get started is by turning to one of the preconfigured
 simulations provided in in the examples directory. This document provides an
-overview how to run or adapt a existing simulation for 
+overview how to run or adapt a existing simulation.
 
-
-
-
-Contents:
 
 .. contents::
 
@@ -66,7 +62,4 @@ Generics
 
 Commercial
 ~~~~~~~~~~
-
-.. autoclass:: tapesim.components.StorageTekSL8500.StorageTekSL8500
-
 

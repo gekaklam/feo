@@ -103,9 +103,6 @@ class Simulation(object):
         self.persistency = PersistencyManager.PersistencyManager() 
         self.report = Report.Report(self)
 
-
-
-
         # Various tape related controller and management facilities
         self.fc = Cache.Cache(self, size=math.pow(1024, 5)*5) # 5 PB shared disk cache
 
@@ -113,6 +110,10 @@ class Simulation(object):
         self.tm = TapeManager.TapeManager(self)
         self.rs = RobotScheduler.RobotScheduler(self) 
         self.io = IOScheduler.IOScheduler(self)
+
+        
+        self.provider_batch_limit = 10
+
 
         pass
 
@@ -137,15 +138,19 @@ class Simulation(object):
 
 
     def step(self):
+        print("--------------------------------------------------------------")
         print("Simulation.step()")
 
-        # Fetch new events from available providers
+        print("Simulation.iteration =", self.iteration)
+
+
+        # Fetch new events from available providers.
         if len(self.IN) < self.provider_batch_limit:
             for provider in self.provider:
                 provider.fetch_batch(self.provider_batch_limit-len(self.IN))
         
 
-        if self.IN <= 0: 
+        if len(self.IN) <= 0: 
             print("Simulation halted. Nothing to do.")
             self.halted = True
         elif self.iteration >= self.max_iterations and self.max_iterations not in ['inf', -1, None]:
@@ -153,17 +158,37 @@ class Simulation(object):
             self.halted = True
         else:
             self.iteration += 1
-            
             # proceed to next step
             if self.confirm_step:
                 user = input("Continue? [Enter]")
 
+        # Process events on next time step.
+        self.process()
 
         pass
 
 
     def process(self):
         """Process requests and reallocate resources if possible."""
+        
+        print("Simulation.process()")
+
+
+        self.IN.sort(key=lambda x: x.time_next_action)
+
+        while len(self.IN):
+            if self.IN[0].time_next_action == self.ts:   # or maybe occur time?
+                print("Timestamp: match")
+                request = self.IN.pop(0)
+                print(request)
+                # do nothing with the request :)
+                #self.waiting.append(request) 
+            else:
+                print("Timestamp: no match")
+                # all elements incoming at this time have been handled
+                break;
+
+
         pass
 
 
@@ -172,6 +197,8 @@ class Simulation(object):
         pass
 
     def finalize(self):
+        print("Simulation.finalize()")
+
         self.fm.dump()
         #self.tm.dump()
         #self.fc.dump()

@@ -23,18 +23,16 @@ Table of Contents
 
 - :doc:`how-to-simulate`
 - :doc:`how-to-create-reports`
-- :doc:`components`
 - :doc:`CRQ`
 
 
 
+Components
+----------
 
+- :doc:`components`
+- :doc:`StorageTekSL8500`
 
-
-.. automodule:: tapesim
-
-.. autoclass:: tapesim.kernels.Simulation
-    :members:
 
 Indices and tables
 ==================

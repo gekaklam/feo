@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015 Jakob Luettgau
@@ -74,12 +73,10 @@ def main():
 
     parser = argparse.ArgumentParser(description='Simulating Tape Storage Libraries/Silos')
 
-    #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512.out")
-    #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512_ALTERED-FOR-TESTING-SHORT.out")
-    #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512_ALTERED-FOR-TESTING.out")
     parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../data/traces/dummy.xferlog")
-    parser.add_argument('--networktopoloy', default="../data/configs/DKRZ.xml")
-    parser.add_argument('--librarytopoloy', default="../data/configs/library_DKRZ.xml")
+    parser.add_argument('--networktopoloy', default="../data/topologies/dummy-network.xml")
+    parser.add_argument('--librarytopoloy', default="../data/topologies/dummy-library.xml")
+
 
     parser.add_argument('--limit', type=int, help='')
     parser.add_argument('--drives', type=int, help='')
@@ -96,13 +93,14 @@ def main():
     # Setup simulation
     print("")
     print("== Initiate Simulation ==")
-    sim = Simulation.Simulation(max_iterations=-1)
+    sim = Simulation.Simulation(max_iterations=10)
     #sim = Simulation.Simulation(max_iterations=-1, confirm_step=True)
     #sim = Simulation.Simulation(max_iterations=-1, keep_finished=True, confirm_step=True)
 
 
     ###########################################################################
     # Register Components and connect
+    ###########################################################################
     print("")
     print("== Prepare Topology ==")
     # load a topology from xml
@@ -128,7 +126,7 @@ def main():
         drives = args.drives
 
 
-    # rebuild filesystem
+    # Rebuild tape filesystem: 
     mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=limit)
     mkfs.rebuild_filesystem()
 
@@ -157,20 +155,19 @@ def main():
         return datetime.datetime(1,1,1, second=s)
 
 
-    # sparse event correct timings?
+    # Sparse event correct timings?
     #Request.Request(s, s.clients[0], occur=tsu(10), attr={'file': 'abc', 'type': 'read', 'size': 100})
     #Request.Request(s, s.clients[0], occur=tss(20), attr={'file': 'xyz', 'type': 'write', 'size': 100})
 
 
     
     
-    # add a number of tape drives
-    #for i in range(1,65):
     print()
-    print("================================================================================================")
-    print("== Install Components ==========================================================================")
-    print("================================================================================================")
-
+    print("==================================================================")
+    print("== Install Components ============================================")
+    print("==================================================================")
+    
+    # Install a number of tape drives.
     drives = [
 			# IBM-LTO4:
 			{"type": "LTO-4", "mode": "rw", "position": (0,10,1,0)},
@@ -215,34 +212,40 @@ def main():
 
     for i,d  in enumerate(drives):
         drivename = "%s Drive %d" % (d["type"], i)
-        new_drive = sim.topology.register_network_component(name=drivename, link_capacity=100, drive=True)
+        new_drive = sim.topology.register_network_component(
+                name=drivename, 
+                link_capacity=100, 
+                drive=True
+            )
 
 
-    # start the simulation
     print()
-    print("================================================================================================")
-    print("== Start Simulation ============================================================================")
-    print("================================================================================================")
+    print("==================================================================")
+    print("== Start Simulation ==============================================")
+    print("==================================================================")
+    # Start the simulation.
     sim.start()
 
-    # Setup up report
+
     print()
-    print("================================================================================================")
-    print("== Report ======================================================================================")
-    print("================================================================================================")
+    print("==================================================================")
+    print("== Report ========================================================")
+    print("==================================================================")
+    # Print report summary.
     #r.write_requests(s.finished)
+
 
     # only needed to test signal handler
     # signal.pause()
 
 
-    # dump hosts observed so far
+    # Dump hosts observed so far.
     print("Trace.hosts")
     print("read:", trace.counter)
     pprint.pprint(trace.hosts)
 
 
-    # dump registered components
+    # Dump registered components.
     print()
     for c in sim.components:
         print(c)
@@ -255,7 +258,7 @@ def main():
 
 
 if __name__ == '__main__':
-    # take the processing time
+    # Take the processing time.
     start = time.clock()
     main()
     end = time.clock()

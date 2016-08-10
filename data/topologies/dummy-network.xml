@@ -15,13 +15,15 @@
 
 	<!-- graph properties -->
 
+	<!-- vertices ########################################################## -->
+
 	<!-- a dummy client for debugging -->
 	<node id="c0">
 		<data key="name">Dummy</data>
 		<data key="eval">Client.Client(s)</data>
 	</node>
 
-	<!-- switches to easily add new nodes -->
+	<!-- switch to easily add new nodes-->
 	<node id="nodeswitch">
 		<data key="name">Switch:NodeSwitch</data>
 	</node>
@@ -36,9 +38,6 @@
 
 
 	<!-- I/O Servers -->
-	<!--
-		A multipath I/O configuration 
-	-->
 	<node id="io0">
 		<data key="name">I/O:A</data>
 		<data key="eval">IOServer.IOServer(s)</data>
@@ -75,16 +74,32 @@
 
 	<!-- TAPE DRIVES -->
 	<!--
-		Add two tape drives as well
-	-->
-	<!--
 	<node id="drive0">
 		<data key="name">Drive:A</data>
 	</node>
 	<edge id="e6" source="drive0" target="driveswitch">
 		<data key="weight">100.0</data>
 	</edge>
+
+	<node id="drive1">
+		<data key="name">Drive:B</data>
+	</node>
+	<edge id="e7" source="drive1" target="driveswitch">
+		<data key="weight">100.0</data>
+	</edge>
+
+	<node id="drive2">
+		<data key="name">Drive:C</data>
+	</node>
+	<edge id="e6" source="drive2" target="driveswitch">
+		<data key="weight">100.0</data>
+	</edge>
 	-->
+
+
+
+
+
 
 
 </graph>

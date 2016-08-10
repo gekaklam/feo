@@ -54,25 +54,22 @@ class Request(object):
         self.id = simulation.rids
         simulation.rids += 1
 
-        # used by the simulation to determine next timestep
+        # Used by the simulation to determine next timestep.
         self.time_next_action = self.time_occur
 
-        # populate attr
+        # Populate attr.
         self.attr = attr
 
-        # add attributes used during bookkeeping
+        # Add attributes used during book-keeping.
         self.remaining = self.attr['size']
-
-        
-
         
         self.attr['analysis'] = None
         self.attr['allocation'] = {'status': None}
 
-
+        # Keep track of network allocations related to this request.
         self.flows = []
 
-        # make this request known to the simulation
+        # Make this request known to the simulation.
         if simulation != None:
             simulation.submit(self)
 
@@ -197,7 +194,7 @@ class Request(object):
         info += self.attr['file']
         info += ' @ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
         info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
-        info += " REMAIN: " + "%s" % str(self.remaining)
+        info += " BYTES REMAINING: " + "%s" % str(self.remaining)
         #info += " ALLOC: " + str(self.attr['allocation'])
         info += " STATUS: " + str(self.status)
         #info += str(self.attr)
