@@ -40,27 +40,21 @@ class ProviderXferlog(object):
         
         self.simulation = simulation
 
-        # trace reader options
+        # Configuration
         self.limit = limit
+        self.tracefile = tracefile
 
+        # Statistics
+        self.counter = 0
         self.hosts = {}
-
         self.size_min = 0
         self.size_max = 0
         self.sizes = []
 
 
-        #selt.fh = open(filepath, "r")
-        self.tracefile = tracefile
-
-        self.counter = 0
-        # init
-
-
-
     def sanitize_type(self, typestring):
         """
-        Ensure xferlog types are mapped top READ and WRITE types known by the simulation.
+        Ensure xferlog types are mapped to READ and WRITE types known by the simulation.
         """
 
         READ = ['PSTO_Cmd', 'STOR_Cmd']
@@ -107,9 +101,6 @@ class ProviderXferlog(object):
     def fetch_one(self):
         """
         Fetch exactly new element from the trace file and submit to the simulation.
-
-
-
         """
 
         # Template to parse xferlog entry:
@@ -131,7 +122,7 @@ class ProviderXferlog(object):
         raw_req = line.split(' ') 
         date_string = "%s %02d %s %s" % (raw_req[1], int(raw_req[2]), raw_req[3], raw_req[4])
         timestamp = datetime.datetime.strptime(date_string, DATE_FORMAT)
-        attr = {'file': None, 'type': None, 'size': None}
+        attr = {'file': raw_req[6], 'type': self.sanitize_type(raw_req[7]), 'size': int(raw_req[8])}
 
         # Maintain a list of known hosts, register unkown hosts to topology.
         clienthost = raw_req[5]
@@ -146,14 +137,6 @@ class ProviderXferlog(object):
 
             new_client = self.simulation.topology.register_network_component(name=clienthost, link_capacity=1000)
             self.hosts[clienthost] = new_client
-  
-
-    
-
-        # TODO set correct size again
-        attr = {'file': raw_req[6], 'type': self.sanitize_type(raw_req[7]), 'size': int(raw_req[8])}
-        #attr = {'file': raw_req[6], 'type': self.sanitize_type(raw_req[7]), 'size': 50000000000}
-        #attr = {'file': raw_req[6], 'type': self.sanitize_type(raw_req[7]), 'size': 500}
 
         # Create actual Request-object
         req = Request.Request(self.simulation, self.hosts[clienthost], occur=timestamp, attr=attr)

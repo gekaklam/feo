@@ -42,7 +42,7 @@ class Request(object):
         self.simulation = simulation
         self.client = client
 
-        # populate request occurence
+        # Populate request occurence timestamp.
         if occur:
             self.time_occur = occur
         elif self.simulation != None:
@@ -130,21 +130,22 @@ class Request(object):
 
 
     def calc_next_action(self):
+        """
+        Calculate when the next status change will happen for this request.
+        """
         seconds = self.remaining / (self.attr['allocation']['max_flow'] * 1024*1024)
-        #print("secs:", seconds)
         microseconds = seconds*1000000
-        #print("microsecs:", microseconds)
         duration = datetime.timedelta(microseconds=microseconds)
-        #duration = datetime.timedelta(seconds=microseconds)
-        #print("duration:", duration, "seconds:", seconds)
-        #print("sim.now(): ", self.simulation.now())
+
         self.time_next_action = self.simulation.now() + duration
         self.time_next_action += datetime.timedelta(microseconds=1000000-self.time_next_action.microsecond)
         #print("Next action:", self.time_next_action)
 
 
     def finalize(self, time=None):
-        """Finalize request. Set done time."""
+        """
+        Finalize request. Set done time.
+        """
 
         self.flows.append({
             'max_flow': 0, 
