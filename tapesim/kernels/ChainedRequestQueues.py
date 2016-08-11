@@ -85,9 +85,14 @@ class Simulation(object):
         ):
 
         # Simulation state
+        self.last_ts = None
         self.ts = starting_time
+        self.next_ts = None
+
         self.halted = False
         self.iteration = 0
+
+
 
         # Simulation control and termination
         self.max_iterations = max_iterations
@@ -116,6 +121,22 @@ class Simulation(object):
 
 
         pass
+
+
+    def suggest_next_ts(self, timestamp):
+        """ Updates the timestamp thats used for the next step."""
+        if self.next_ts == None or timestamp < self.next_ts:
+            self.next_ts = timestamp
+
+        print("Found next_ts:", self.next_ts)
+
+    def consider_request_ts(self, lst):
+        """ Consider requests in lst when determining next timestamp. """
+        # TODO: double check when sorting is actually necessary
+        if len(lst):
+            lst.sort(key=lambda x: x.time_next_action)
+            self.suggest_next_ts(lst[0].time_next_action)
+
 
     def submit(self, request):
         """Adds a job to the queue."""

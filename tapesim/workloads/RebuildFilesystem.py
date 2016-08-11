@@ -16,6 +16,14 @@ import tapesim.datatypes.Request as Request
 
 
 class RebuildFilesystem(object):
+    """
+    RebuildFilesystem is used to analyse a trace for files which are assumed to
+    be archived in the tape system. If no mapper or position generator is provided
+    the system will randomly populate tapes in the system.
+
+    """
+
+
     def __init__(self, simulation, tracefile, limit=None):
 
         self.simulation = simulation
@@ -35,9 +43,7 @@ class RebuildFilesystem(object):
         self.size_max = 0
         self.sizes = []
 
-        #  0   1  2     3     4        5                   6                     7        8
-        #  wd mon      time  year     host               file                   type     bytes
-        # Tue Dec 1 00:01:11 2015 10.50.35.16 2100_ten/2084/208404_qtimer.tar PSTO_Cmd 14643200
+
 
         #selt.fh = open(filepath, "r")
         self.tracefile = tracefile
@@ -75,6 +81,10 @@ class RebuildFilesystem(object):
 
     def fetch_one(self):
 
+
+        #  0   1  2     3     4        5                   6                     7        8
+        #  wd mon      time  year     host               file                   type     bytes
+        # Tue Dec 1 00:01:11 2015 10.50.35.16 2100_ten/2084/208404_qtimer.tar PSTO_Cmd 14643200
         DATE_FORMAT = "%b %d %H:%M:%S %Y"
 
         line = self.tracefile.readline()
@@ -104,25 +114,39 @@ class RebuildFilesystem(object):
 
 
     def rebuild_file(self, attr):
+        """
 
+
+        """
+
+        # Conviently access the tape and file management of the simulation.
         fm = self.simulation.fm
         tm = self.simulation.tm
 
+
+        # Is the file already present?
         f = fm.lookup(attr['file'])
         if f:
+            # File already exists. Print for debug purposes.
             print(f)
+
         elif attr['type'] in ['read', 'r']:
-            print("NEW FILE:")
-            # allocate tape
+            # File does not exists and this a read-like request.
+            # Default for READ: Precreate file.
+            print("RebuildFilesystem: NEW FILE:")
             tid, t = tm.allocate(attr['size'])   
             print("tid, t:", tid, tm.tapes[tid])
 
             fm.update(name=attr['file'], tape=tid, size=attr['size'])
             f = fm.lookup(attr['file'])
             print("f:", f)
-            # create file
         else:
-            print("should be write")
+            # File does not exists, but access type is non-read.
+            # File may or may not reside in original system
+            # Default for WRITE: Assume file is not present yet. WORM ;)
+            # For Write-Once-Read-Many this seems a sensible default.
+            # In case of other I/O workloads this maybe to optimisitc.
+            print("RebuildFilesystem: New file but will be written.")
 
 
         # hosts

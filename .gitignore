@@ -10,3 +10,9 @@ examples/visualization/*
 
 
 *.pyc
+
+
+
+*.swp
+*.swo
+*.swn
