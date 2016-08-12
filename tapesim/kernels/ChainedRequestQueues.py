@@ -66,15 +66,15 @@ class Simulation(object):
     drives  = []     # drives
 
     # Queues
-    IN = []
-    OUT = []
+    INCOMING = []
+    OUTGOING = []
     
-    diskIO = []
+    diskIO     = []
     disk_dirty = []
-    tapeIO = []
-    robots = []
+    tapeIO     = []
+    robots     = []
 
-    network = []
+    network    = []
 
     def __init__(self,
             starting_time=datetime.datetime(1,1,1, microsecond=0),
@@ -85,13 +85,11 @@ class Simulation(object):
         ):
 
         # Simulation state
+        self.halted = False
+        self.iteration = 0
         self.last_ts = None
         self.ts = starting_time
         self.next_ts = None
-
-        self.halted = False
-        self.iteration = 0
-
 
 
         # Simulation control and termination
@@ -99,26 +97,24 @@ class Simulation(object):
         self.confirm_step = confirm_step
         self.keep_finished = keep_finished
 
+
         # Simulation Event Provider
         self.provider = []
         self.provider_batch_limit = 10
-        self.rids = 0 # request IDs    def process_read(self, request):
+        self.rids = 0 # request IDs    
+
 
         # Analysis and reporting helpers
         self.persistency = PersistencyManager.PersistencyManager() 
         self.report = Report.Report(self)
 
+
         # Various tape related controller and management facilities
         self.fc = Cache.Cache(self, size=math.pow(1024, 5)*5) # 5 PB shared disk cache
-
         self.fm = FileManager.FileManager(self)
         self.tm = TapeManager.TapeManager(self)
         self.rs = RobotScheduler.RobotScheduler(self) 
         self.io = IOScheduler.IOScheduler(self)
-
-        
-        self.provider_batch_limit = 10
-
 
         pass
 
@@ -140,38 +136,56 @@ class Simulation(object):
 
     def submit(self, request):
         """Adds a job to the queue."""
-        print("Simulation.submit(%s)" % repr(request))
-        self.IN.append(request)
+        print("Simulation.submit(%s)" % repr(request.adr()))
+        self.INCOMING.append(request)
 
 
 
     def start(self):
-        """Starts the simulation."""
+        """
+        Start the simulation.
+        """
         print("Simulation.start()")
         self.run()
         pass
 
+    
+
     def run(self):
+        """
+        Step through the simulation. 
+        """
         print("Simulation.run()")
         while not self.halted:
             self.step()
 
 
-
     def step(self):
         print("--------------------------------------------------------------")
         print("Simulation.step()")
-
-        print("Simulation.iteration =", self.iteration)
-
+        self.print_status()
+       
 
         # Fetch new events from available providers.
-        if len(self.IN) < self.provider_batch_limit:
+        if len(self.INCOMING) < self.provider_batch_limit:
             for provider in self.provider:
-                provider.fetch_batch(self.provider_batch_limit-len(self.IN))
-        
+                provider.fetch_batch(self.provider_batch_limit-len(self.INCOMING))
+       
+        # Find very next event from possible candidates.
+        self.consider_request_ts(self.INCOMING)
+        #self.consider_request_ts(self.OUTGOING)
+        #self.consider_request_ts(self.disk_IO)
+        #self.consider_request_ts(self.tape_IO)
+        #self.consider_request_ts(self.robots)
 
-        if len(self.IN) <= 0: 
+        # Set new ts and reset next_ts to determine winner.
+        self.last_ts = self.ts
+        self.ts = self.next_ts
+        self.next_ts = None
+
+        
+        if len(self.INCOMING) <= 0: 
+            # TODO: Doesn't this halt the simulation to early?
             print("Simulation halted. Nothing to do.")
             self.halted = True
         elif self.iteration >= self.max_iterations and self.max_iterations not in ['inf', -1, None]:
@@ -183,8 +197,8 @@ class Simulation(object):
             if self.confirm_step:
                 user = input("Continue? [Enter]")
 
-        # Process events on next time step.
-        self.process()
+            # Process events on next time step.
+            self.process()
 
         pass
 
@@ -195,12 +209,12 @@ class Simulation(object):
         print("Simulation.process()")
 
 
-        self.IN.sort(key=lambda x: x.time_next_action)
+        self.INCOMING.sort(key=lambda x: x.time_next_action)
 
-        while len(self.IN):
-            if self.IN[0].time_next_action == self.ts:   # or maybe occur time?
+        while len(self.INCOMING):
+            if self.INCOMING[0].time_next_action == self.ts:   # or maybe occur time?
                 print("Timestamp: match")
-                request = self.IN.pop(0)
+                request = self.INCOMING.pop(0)
                 print(request)
                 # do nothing with the request :)
                 #self.waiting.append(request) 
@@ -223,4 +237,31 @@ class Simulation(object):
         self.fm.dump()
         #self.tm.dump()
         #self.fc.dump()
+
+
+
+    def print_status(self):
+        """
+        Print a status summary of the current simulation state.
+        """
+        print(" __________")
+        print("/")
+        print("iteration=%d/%d, ts=%s" % (
+            self.iteration,
+            self.max_iterations,
+            str(self.ts)
+            ))
+
         
+        print("Incoming:  ", len(self.INCOMING))
+        self.print_queue(self.INCOMING)
+
+
+        print("\__________")
+        print("")
+    
+
+    def print_queue(self, queue):
+        for i, request in enumerate(queue):
+            print(request)
+

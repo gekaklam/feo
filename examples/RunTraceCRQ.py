@@ -71,7 +71,10 @@ def main():
     # print(os.environ['TAPESIM_'])
 
 
-    parser = argparse.ArgumentParser(description='Simulating Tape Storage Libraries/Silos')
+    parser = argparse.ArgumentParser(
+        description='Simulating Tape Storage Libraries/Silos using the CRQ kernel. Chained Request Queues uses dedicated queues for Waiting Request, Disk I/O, Dirty Files, Tape I/O and Robots as well as IN and OUT going network traffic.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+        )
 
     parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../data/traces/dummy.xferlog")
     parser.add_argument('--networktopoloy', default="../data/topologies/dummy-network.xml")
@@ -143,21 +146,7 @@ def main():
 
 
 
-    # Issue some requests to be simulated.
-    print()
-    print("== Submit some requests ==")
-    def tsu(us):
-        """ Convienient microscond datetime creation. """
-        return datetime.datetime(1,1,1, microsecond=us)
 
-    def tss(s):
-        """ Convienient second datetime creation. """
-        return datetime.datetime(1,1,1, second=s)
-
-
-    # Sparse event correct timings?
-    #Request.Request(s, s.clients[0], occur=tsu(10), attr={'file': 'abc', 'type': 'read', 'size': 100})
-    #Request.Request(s, s.clients[0], occur=tss(20), attr={'file': 'xyz', 'type': 'write', 'size': 100})
 
 
     

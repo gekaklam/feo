@@ -194,7 +194,8 @@ class Request(object):
         info += self.attr['type'] + " "
         info += self.attr['file']
         info += ' @ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
-        info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
+        #info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
+        info += ' next ' +    self.time_next_action.strftime("%H:%M:%S.%f")
         info += " BYTES REMAINING: " + "%s" % str(self.remaining)
         #info += " ALLOC: " + str(self.attr['allocation'])
         info += " STATUS: " + str(self.status)
@@ -204,11 +205,12 @@ class Request(object):
         if self.id != None:
             rid = self.id
 
-        return '<%s %s %s: %s>' % (adr, self.__class__.__name__, rid, info)
+        return '<%s %s %04d: %s>' % (adr, self.__class__.__name__, rid, info)
 
     def adr(self):
         adr = hex(id(self))
         info = ''
+        info += '@ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
         return '<%s %s: %s>' % (adr, self.__class__.__name__, info)
 
    

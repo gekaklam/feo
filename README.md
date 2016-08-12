@@ -3,15 +3,22 @@
 Feo, as a reference to iron oxide (here Fe2O3) which is commonly used in magnetic tape media, allows to simulate automated tape libraries systems integrated into the storage hierarchy of modern data centers.
 
 
-## Installation
+## Getting started
 
+Assuming all requirements are met the easiest way to get started is by adapting
+one of the prepared configurations in the example directory. 
 
+    cd examples
+    # use -h flag to show possible parameters and options for configurations
+    ./RunTraceCRQ.py -h
 
+    # or run with a default dummy configuration
+    ./RunTraceCRQ.py
 
 
 ## Requirements
 
-Feo is written in Python 3 and requires graph-tool[1] (a python wrapper for C++ 
+Feo is written in Python 3 and requires graph-tool (a python wrapper for C++ 
 graph functions).
 
 [1] http://graph-tool.skewed.de/
