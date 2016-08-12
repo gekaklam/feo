@@ -48,14 +48,20 @@ class Topology(object):
         self.servers = []
         self.drives = []
 
+        self.mainswitch = None
         self.nodeswitch = None
         self.driveswitch = None
+
+
+        self.pos_dirty = True
 
         if network_xml:
             self.network_from_xml(network_xml)
 
         if tape_xml:
             self.tape_from_xml(tape_xml)
+
+
 
         pass
 
@@ -96,64 +102,60 @@ class Topology(object):
         return res, max_flow
 
     def allocate_capacity(self, res):
-        print("ALLOC TOPO")
+        print("Topology.allocate_capacity()")
         g = self.graph
         for e in g.edges():
             g.ep['capacity'][e] -= res[e]
 
     def free_capacity(self, res):
-        print("FREE TOPO")
+        print("Topology.free_capacity()")
         g = self.graph
         for e in g.edges():
             g.ep['capacity'][e] += res[e]
 
 
     def register_network_component(self, name="NetworkComponent", attach_to=None, link_capacity=10, drive=False):
+        """
+        Add a new network component to the topology.
+        """
         s = self.simulation
         g = self.graph
 
         print("INFO: New network component added:", name)
 
-        # register vertex, add properties
+
+        # Register a new vertex and add properties
         v = g.add_vertex()
-        #g.vp['name'][v] = name
         g.vp['name'][v] = name
         
-        # create a new client 
-       
+        # Create a simulation component object depending on the type (drive, client)
         if drive:
             new_comp = Drive.Drive(s)
         else:
             new_comp = Client.Client(s)
         
-
+        # Associate topology vertices and simulation components with each other.
+        g.vp['obj'][v] = new_comp
         new_comp.nodeidx = int(v)
         new_comp.graph = g
 
-        g.vp['obj'][v] = new_comp
-
-
-        # if drive and 
+        # By default attach new drives to the driveswitch.
         if drive and self.driveswitch != None and attach_to == None:
             attach_to = self.driveswitch
 
-        # attach to, default behaivor
+        # By default attach other network components to the nodeswitch if attach_to is not set.
         if self.nodeswitch != None and attach_to == None:
             attach_to = self.nodeswitch
 
+        # Make connections full-duplex
         if attach_to != None:
-            # make full duplex
             e1 = g.add_edge(v, attach_to)
             e2 = g.add_edge(attach_to, v)
-
             g.ep['capacity'][e1]  = link_capacity
             g.ep['capacity'][e2]  = link_capacity
 
-        # recalc layout
-        #self.pos = gt.fruchterman_reingold_layout(g, a=None, r=5.0, scale=None, circular=True, grid=True, t_range=None, n_iter=100)
-        #self.pos = gt.fruchterman_reingold_layout(g, a=5.0, r=0.5, scale=0.1, circular=True, grid=False, t_range=None, n_iter=100)
-        #self.pos = gt.radial_tree_layout(g, g.vertex(0))
-        #self.draw_graph('capacity', 'visualisation/current.pdf')
+        # Ensure graph layout positions are recalculated when drawing.
+        self.pos_dirty = True
 
         return new_comp
 
@@ -167,7 +169,7 @@ class Topology(object):
         s = self.simulation
         g = self.graph
 
-        # make network full-duplex
+        # Make network full-duplex.
         print("Consider all connections full-duplex (=> make graph symetric)")
         edges = []
         for e in g.edges():
@@ -180,7 +182,7 @@ class Topology(object):
 
 
 
-        # add properties to graph needed for network simulation
+        # Add properties to graph needed for network simulation
         g.vertex_properties['obj'] = g.new_vertex_property("python::object")
         g.edge_properties['capacity'] = g.ep['weight'].copy()
 
@@ -189,7 +191,7 @@ class Topology(object):
         #    print(e, "w:", g.ep.weight[e], "c:", g.ep.capacity[e])
         #print()
 
-        # instanciate tape-sim components from graph
+        # Instanciate tape-sim components from graph
         print("Instanciating components:")
         for v in g.vertices():
             print(v, g.vp.name[v], g.vp['eval'][v], g.vp['_graphml_vertex_id'][v])
@@ -202,7 +204,8 @@ class Topology(object):
                 self.nodeswitch = v
             elif len(sc) > 1 and sc[1] == 'DriveSwitch':
                 self.driveswitch = v
-
+            elif len(sc) > 1 and sc[1] == 'MainSwitch':
+                self.mainswitch = v
 
 
             obj = None
@@ -220,32 +223,31 @@ class Topology(object):
             print()
 
 
-        # rename the default nodeswitch to a more friendly name
+        # Rename the default nodeswitch to a more friendly name.
         if self.nodeswitch != None:
-            g.vp.name[self.nodeswitch] = 'Node Switch'
+            g.vp.name[self.nodeswitch] = 'Nodes'
 
         if self.driveswitch != None:
-            g.vp.name[self.driveswitch] = 'Drive Switch'
+            g.vp.name[self.driveswitch] = 'Drives'
 
+        if self.mainswitch != None:
+            g.vp.name[self.mainswitch] = 'Main'
 
 
         name = g.vp["name"]
         weight = g.ep["weight"]
 
-        # prepare label text
-        edge_label = g.new_edge_property("string")
-        gt.map_property_values(weight, edge_label, lambda x: str(x))
+        # Prepare label text property 
+        #edge_label = g.new_edge_property("string")
+        #gt.map_property_values(weight, edge_label, lambda x: str(x))
 
-        # calc pos once to be used by all other graphs
-        #self.pos = gt.sfdp_layout(g, K=100, C=0.1, gamma=10.0, mu=0.0)
-        #self.pos = gt.sfdp_layout(g, gamma=10.0)
-        #self.pos = gt.sfdp_layout(g, gamma=200.0)
-        #self.pos = gt.fruchterman_reingold_layout(g, a=None, r=5.0, scale=None, circular=True, grid=True, t_range=None, n_iter=100)
-        #self.pos = gt.arf_layout(g, d=5.0, a=10, dt=0.001, epsilon=1e-06, max_iter=1000)
-        self.pos = gt.radial_tree_layout(g, g.vertex(0))
-
-        # draw the network
+        # Draw the network.
+        self.pos_dirty = True
         self.draw_graph('weight', 'visualisation/on-initialisation.pdf')
+
+
+
+
 
 
     def tape_from_xml(self, path):
@@ -268,15 +270,31 @@ class Topology(object):
      
 
     def draw_graph(self, e_label, output, v_label='idx'):
+        """
+        Helper for convienient and consistent graph drawing.
+        """
+
         s = self.simulation
         g = self.graph
+
+        # Update position if the topology changed.
+        if self.pos_dirty:
+            # Calculate pos once to be used by all other graphs
+            #self.pos = gt.sfdp_layout(g, K=100, C=0.1, gamma=10.0, mu=0.0)
+            #self.pos = gt.sfdp_layout(g, gamma=10.0)
+            #self.pos = gt.sfdp_layout(g, gamma=200.0)
+            #self.pos = gt.arf_layout(g, d=5.0, a=10, dt=0.001, epsilon=1e-06, max_iter=1000)
+            #self.pos = gt.radial_tree_layout(g, self.driveswitch)
+            self.pos = gt.radial_tree_layout(g, self.mainswitch)
+            self.pos_dirty = False
+
 
         if type(e_label) is str:
             ep = g.ep[e_label]
         else:
             ep = e_label
 
-        # prepare busy fill color
+        # Set node fill color depending on certain criteria: busy
         busy_fill = g.new_vertex_property('vector<double>')
         for v in g.vertices():
             if g.vp['obj'][v].has_capacity():
@@ -284,14 +302,11 @@ class Topology(object):
             else:
                 busy_fill[v] = [1,0,0,0.5]
 
-        # prepare label text
+        # Prepare label text and ensure all labels are converted to be strings
         edge_label = g.new_edge_property("string")
-        # ensure strings':w
         gt.map_property_values(ep, edge_label, lambda x: str(x))
 
-
-    
-        # Adjust, vertex label?
+        # Adjust vertex label depending on type.
         if v_label != None:
             if v_label == 'idx':
                 vertex_label = g.copy_property(g.vp['name'])
@@ -336,5 +351,6 @@ class Topology(object):
             edge_font_family = 'sans-serif',
             edge_font_size = 8,
             edge_color = [0,0,0,0.2],
+
 
             output=output)

@@ -17,23 +17,26 @@
 
 	<!-- vertices ########################################################## -->
 
-	<!-- a dummy client for debugging -->
-	<node id="c0">
-		<data key="name">Dummy</data>
-		<data key="eval">Client.Client(s)</data>
-	</node>
+
 
 	<!-- switch to easily add new nodes-->
+	<node id="mainswitch">
+		<data key="name">Switch:MainSwitch</data>
+	</node>
+
 	<node id="nodeswitch">
 		<data key="name">Switch:NodeSwitch</data>
 	</node>
 
-	<node id="sext">
-		<data key="name">Switch</data>
-	</node>
-
 	<node id="driveswitch">
 		<data key="name">Switch:DriveSwitch</data>
+	</node>
+
+
+	<!-- a dummy client for debugging -->
+	<node id="c0">
+		<data key="name">Dummy</data>
+		<data key="eval">Client.Client(s)</data>
 	</node>
 
 
@@ -55,19 +58,19 @@
 	</edge>
 
 
-	<edge id="e0" source="nodeswitch" target="sext">
+	<edge id="e0" source="nodeswitch" target="mainswitch">
 		<data key="weight">15000.0</data>
 	</edge>
 
-	<edge id="e2" source="sext" target="driveswitch">
+	<edge id="e2" source="mainswitch" target="driveswitch">
 		<data key="weight">15000.0</data>
 	</edge>
 
-	<edge id="e3" source="io0" target="sext">
+	<edge id="e3" source="io0" target="mainswitch">
 		<data key="weight">30.0</data>
 	</edge>
 
-	<edge id="e4" source="io1" target="sext">
+	<edge id="e4" source="io1" target="mainswitch">
 		<data key="weight">30.0</data>
 	</edge>
 

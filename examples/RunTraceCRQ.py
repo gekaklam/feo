@@ -200,12 +200,16 @@ def main():
     ]
 
     for i,d  in enumerate(drives):
-        drivename = "%s Drive %d" % (d["type"], i)
+        #drivename = "%s Drive %d" % (d["type"], i)
+        drivename = "%s" % (d["type"])
         new_drive = sim.topology.register_network_component(
                 name=drivename, 
                 link_capacity=100, 
                 drive=True
             )
+
+
+    sim.topology.draw_graph('weight', 'visualisation/on-initialisation.pdf')
 
 
     print()
@@ -215,6 +219,7 @@ def main():
     # Start the simulation.
     sim.start()
 
+    sim.topology.draw_graph('weight', 'visualisation/on-termination.pdf')
 
     print()
     print("==================================================================")
