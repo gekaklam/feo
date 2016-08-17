@@ -24,6 +24,7 @@ import os
 import re
 import datetime
 import random
+import pprint
 # import datatypes required used in this simulation
 import tapesim.datatypes.Request as Request
 
@@ -86,6 +87,10 @@ class ProviderXferlog(object):
         last = None
         for i in range(0,num):
             last = self.fetch_one()
+            
+            if last == None:
+                # EOT
+                return
 
         # keep fetching until new timestamp occurs
         if last != None:
@@ -144,4 +149,8 @@ class ProviderXferlog(object):
         return req
 
 
+    def report(self):
+        print("Trace.counter=%d" % self.counter)
+        print("Trace.hosts")
+        pprint.pprint(self.hosts)
 

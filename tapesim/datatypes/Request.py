@@ -19,30 +19,38 @@
 import datetime
 
 
+READ = ['read', 'r', 'WRITE', 'W']
+WRITE = ['write', 'w', 'WRITE', 'W']
+
 class Request(object):
-
-    simulation = None
-    client = None
-
-    attr = {}
-    time_occur  = None
-    time_next_action  = None
-    time_finished = None
-    time_wait = None # accumulated wait time
-
-    remaining = None
-    
-    persistend = False
-
-    status = ''
-    tags = set()
-
+    """
+    Requests are used to 
+    """
 
     def __init__(self, simulation=None, client=None, occur=None, attr={}):
         self.simulation = simulation
         self.client = client
 
-        # Populate request occurence timestamp.
+        self.id = simulation.rids
+        simulation.rids += 1
+
+        # Request state.
+        self.type = None
+        self.remaining = None
+        self.is_cached = None
+        self.persistend = False
+
+        self.status = ''
+        self.tags = set()
+        self.log = []
+
+
+        # All about time.
+        self.time_occur  = None
+        self.time_next_action  = None
+        self.time_finished = None
+        self.time_wait = None # accumulated wait time
+
         if occur:
             self.time_occur = occur
         elif self.simulation != None:
@@ -50,23 +58,22 @@ class Request(object):
         else:
             print("Warning: free-floating request.")
 
-
-        self.id = simulation.rids
-        simulation.rids += 1
-
         # Used by the simulation to determine next timestep.
         self.time_next_action = self.time_occur
 
-        # Populate attr.
-        self.attr = attr
 
-        # Add attributes used during book-keeping.
-        self.remaining = self.attr['size']
-        
+        # Populate attr for unstable and experimental request properties.
+        self.attr = attr
         self.attr['analysis'] = None
         self.attr['allocation'] = {'status': None}
 
-        # Keep track of network allocations related to this request.
+
+        # Unpack attr to stable request properties.
+        # Add attributes used during book-keeping.
+        self.remaining = self.attr['size']
+        self.type = attr['type']
+
+        # Network allocations related to this request.
         self.flows = []
 
         # Make this request known to the simulation.

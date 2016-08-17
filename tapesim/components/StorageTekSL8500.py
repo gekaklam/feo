@@ -47,7 +47,7 @@ def travel_time_easing(distance, max_velocity, accelleration, decceleration=None
         decceleration = accelleration
 
 
-
+    # TODO
 
     time_max = (distance - distace_acc - distance_decc) / max_velocity
 

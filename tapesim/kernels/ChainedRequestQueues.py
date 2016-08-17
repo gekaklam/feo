@@ -50,8 +50,12 @@ import tapesim.components.TapeManager as TapeManager
 # scheduler
 import tapesim.scheduling.RobotScheduler as RobotScheduler
 import tapesim.scheduling.IOScheduler as IOScheduler
+import tapesim.scheduling.IOScheduler as DiskIOScheduler
+import tapesim.scheduling.IOScheduler as TapeIOScheduler
 
 
+READ = ['read', 'r', 'WRITE', 'W']
+WRITE = ['write', 'w', 'WRITE', 'W']
 
 
 class Simulation(object):
@@ -69,12 +73,12 @@ class Simulation(object):
     INCOMING = []
     OUTGOING = []
     
-    diskIO     = []
-    disk_dirty = []
-    tapeIO     = []
-    robots     = []
+    DISKIO  = []
+    DIRTY   = []
+    TAPEIO  = []
+    ROBOTS  = []
 
-    network    = []
+    NETWORK = []
 
     def __init__(self,
             starting_time=datetime.datetime(1,1,1, microsecond=0),
@@ -115,6 +119,8 @@ class Simulation(object):
         self.tm = TapeManager.TapeManager(self)
         self.rs = RobotScheduler.RobotScheduler(self) 
         self.io = IOScheduler.IOScheduler(self)
+        self.diskio = IOScheduler.IOScheduler(self)
+        self.tapeio = IOScheduler.IOScheduler(self)
 
         pass
 
@@ -209,8 +215,16 @@ class Simulation(object):
         print("Simulation.process()")
 
 
-        self.INCOMING.sort(key=lambda x: x.time_next_action)
+        # TODO: update active on this timestemp requests or do we have to update more? to reflect state
 
+
+        # maybe collect one large list of happening events
+        # and handle them depending on their next decision?
+
+
+
+        # We have to consider 
+        self.INCOMING.sort(key=lambda x: x.time_next_action)
         while len(self.INCOMING):
             if self.INCOMING[0].time_next_action == self.ts:   # or maybe occur time?
                 print("Timestamp: match")
@@ -218,10 +232,72 @@ class Simulation(object):
                 print(request)
                 # do nothing with the request :)
                 #self.waiting.append(request) 
+
+
+                # INCOMING
+                # Check Type
+                # Check Cache
+                # Check Network
+                if request.type in WRITE:
+                    print(request.adr(), "is write");
+                    self.DISKIO.append(request) 
+                elif request.type in READ:
+                    print(request.adr(), "is read");
+                    if request.is_cached:
+                        print(request.adr(), "is cached");
+                        self.DISKIO.append(request) 
+                    else:
+                        print(request.adr(), "is not cached");
+                        self.TAPEIO.append(request) 
+                      
+                # Only start processing request when all required allocations are granted?
+               
+
+                # DISKIO 
+                #self.NETWORK.append(request) 
+
+                # Check Free Disk Space
+                # Check Network
+
+                # Allocations:
+                # IN:    Client --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
+                #                                         ->  Global Disk Cache (Network)
+
+                # TAPE:  Drive  --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
+                #                                         ->  Global Disk Cache (Network)
+                
+                # DIRTY: Cache  --Network-->  I/O Server  ->  Drive
+               
+                # All Disk I/O is currently limited only by the Network.
+                # The Disk I/O queue decides which requests may get scheduled first.
+                
+
+
+
+                #self.DISKIO.append(request) 
+
+                #self.INCOMING.append(request) 
+                #self.DISKIO.append(request) 
+                #self.TAPEIO.append(request) 
+                #self.DIRTY.append(request) 
+                #self.NETWORK.append(request) 
+                #self.OUTGOING.append(request) 
+
+
             else:
                 print("Timestamp: no match")
                 # all elements incoming at this time have been handled
                 break;
+
+
+    
+
+        #######################################################################
+
+
+
+
+
 
 
         pass
@@ -231,6 +307,7 @@ class Simulation(object):
         """Handle the incoming request."""
         pass
 
+
     def finalize(self):
         print("Simulation.finalize()")
 
@@ -239,6 +316,7 @@ class Simulation(object):
         #self.fc.dump()
 
 
+    
 
     def print_status(self):
         """
@@ -251,11 +329,9 @@ class Simulation(object):
             self.max_iterations,
             str(self.ts)
             ))
-
         
         print("Incoming:  ", len(self.INCOMING))
         self.print_queue(self.INCOMING)
-
 
         print("\__________")
         print("")

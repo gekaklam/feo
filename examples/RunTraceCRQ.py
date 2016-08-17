@@ -71,6 +71,8 @@ def main():
     # print(os.environ['TAPESIM_'])
 
 
+
+
     parser = argparse.ArgumentParser(
         description='Simulating Tape Storage Libraries/Silos using the CRQ kernel. Chained Request Queues uses dedicated queues for Waiting Request, Disk I/O, Dirty Files, Tape I/O and Robots as well as IN and OUT going network traffic.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -96,7 +98,8 @@ def main():
     # Setup simulation
     print("")
     print("== Initiate Simulation ==")
-    sim = Simulation.Simulation(max_iterations=10)
+    sim = Simulation.Simulation(max_iterations=-1)
+    #sim = Simulation.Simulation(max_iterations=10)
     #sim = Simulation.Simulation(max_iterations=-1, confirm_step=True)
     #sim = Simulation.Simulation(max_iterations=-1, keep_finished=True, confirm_step=True)
 
@@ -209,7 +212,7 @@ def main():
             )
 
 
-    sim.topology.draw_graph('weight', 'visualisation/on-initialisation.pdf')
+    sim.topology.draw_graph('capacity', 'visualisation/after-installation.pdf')
 
 
     print()
@@ -219,7 +222,7 @@ def main():
     # Start the simulation.
     sim.start()
 
-    sim.topology.draw_graph('weight', 'visualisation/on-termination.pdf')
+    sim.topology.draw_graph('capacity', 'visualisation/on-termination.pdf')
 
     print()
     print("==================================================================")
@@ -233,10 +236,8 @@ def main():
     # signal.pause()
 
 
-    # Dump hosts observed so far.
-    print("Trace.hosts")
-    print("read:", trace.counter)
-    pprint.pprint(trace.hosts)
+    # Dump hosts observed so far.   
+    trace.report()
 
 
     # Dump registered components.
