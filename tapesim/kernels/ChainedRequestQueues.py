@@ -41,7 +41,7 @@ import tapesim.components.IOServer as IOServer
 import tapesim.components.Drive as Drive
 import tapesim.components.Library as Library
 
-# import virtual components
+# import virtual/software components
 import tapesim.components.Cache as Cache
 import tapesim.components.FileManager as FileManager
 import tapesim.components.RAIDManager as RAIDManager
@@ -270,7 +270,17 @@ class Simulation(object):
                
                 # All Disk I/O is currently limited only by the Network.
                 # The Disk I/O queue decides which requests may get scheduled first.
-                
+
+                if request.type in WRITE:
+                    #self.NETWORK.append(request) 
+                    #self.DIRTY.append(request) 
+                    pass
+                elif request.type in READ:
+                    #self.NETWORK.append(request) 
+                    pass
+
+                    
+
 
 
 
@@ -286,7 +296,7 @@ class Simulation(object):
 
             else:
                 print("Timestamp: no match")
-                # all elements incoming at this time have been handled
+                # All elements incoming at this time have been handled (list is sorted!).
                 break;
 
 

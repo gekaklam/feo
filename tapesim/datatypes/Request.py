@@ -39,6 +39,7 @@ class Request(object):
         self.remaining = None
         self.is_cached = None
         self.persistend = False
+        self.action = None
 
         self.status = ''
         self.tags = set()
@@ -198,7 +199,7 @@ class Request(object):
     def __repr__(self):
         adr = hex(id(self))
         info = ''
-        info += self.attr['type'] + " "
+        info += self.type + ' '
         info += self.attr['file']
         info += ' @ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
         #info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -212,13 +213,19 @@ class Request(object):
         if self.id != None:
             rid = self.id
 
-        return '<%s %s %04d: %s>' % (adr, self.__class__.__name__, rid, info)
+        #return '<%s %s %04d: %s>' % (adr, self.__class__.__name__, rid, info)
+        return '<%s %04d: %s>' % (self.__class__.__name__, rid, info)
 
     def adr(self):
         adr = hex(id(self))
         info = ''
+        info += self.type + ' '
         info += '@ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
-        return '<%s %s: %s>' % (adr, self.__class__.__name__, info)
+        #return '<%s %s: %s>' % (adr, self.__class__.__name__, info)
+        rid = ''
+        if self.id != None:
+            rid = self.id
+        return '<%s %04d: %s>' % (self.__class__.__name__, rid, info)
 
    
 
