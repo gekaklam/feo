@@ -272,8 +272,13 @@ class Simulation(object):
                 # The Disk I/O queue decides which requests may get scheduled first.
 
                 if request.type in WRITE:
+                    #self.TAPEIO.append(request) 
+                    #self.DIRTY.append(request)    
                     #self.NETWORK.append(request) 
-                    #self.DIRTY.append(request) 
+                    
+                    # 
+
+
                     pass
                 elif request.type in READ:
                     #self.NETWORK.append(request) 

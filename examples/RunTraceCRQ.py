@@ -248,6 +248,20 @@ def main():
 
     sim.finalize()
 
+    print()
+    print("==================================================================")
+    print("== Snapshot ======================================================")
+    print("==================================================================")
+    print(sim.persistency.path)
+
+    print("\nSome commands to quickly inspect this run:")
+    print("cd", sim.persistency.path)
+    print("nautilus", sim.persistency.path)
+
+    print()
+    print("==================================================================")
+    print("== Performance ===================================================")
+    print("==================================================================")
 
     pass
 
