@@ -26,6 +26,9 @@ import pprint
 import pprint
 import datetime
 import time
+import locale
+locale.setlocale(locale.LC_ALL, 'en_US')
+
 
 # add parent directy as python path to allow examples to work without installing
 sys.path.insert(0, "../")

@@ -26,6 +26,16 @@ class Cache(tapesim.components.Component.Component):
     Caches in the model are more or less lookup tables that will forget entries
     after a certain time or when overflowing.
 
+
+    Modes:
+        Read-Through Caching
+        Write-Through Caching
+        Write-Behind Caching
+        Refresh-Ahead Caching
+
+        Read-Ahead
+
+
     """
     # TODO: link to simulation?
 
@@ -39,6 +49,8 @@ class Cache(tapesim.components.Component.Component):
         self.size = size
         self.remain = size
 
+
+        self.mode = None
 
         self.fieldnames = [
             'datetime',

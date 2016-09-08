@@ -100,6 +100,7 @@ class Simulation(object):
         self.max_iterations = max_iterations
         self.confirm_step = confirm_step
         self.keep_finished = keep_finished
+        self.dump_flow_history = False
 
 
         # Simulation Event Provider
@@ -214,6 +215,7 @@ class Simulation(object):
         
         print("Simulation.process()")
 
+        self.dump_flow_history = False
 
         # TODO: update active on this timestemp requests or do we have to update more? to reflect state
 
@@ -232,6 +234,8 @@ class Simulation(object):
                 print(request)
                 # do nothing with the request :)
                 #self.waiting.append(request) 
+
+                request.finalize()
 
 
                 # INCOMING
@@ -329,6 +333,10 @@ class Simulation(object):
         self.fm.dump()
         #self.tm.dump()
         #self.fc.dump()
+
+    def now(self):
+        """docstring for now"""
+        return self.ts
 
 
     
