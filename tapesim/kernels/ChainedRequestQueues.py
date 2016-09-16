@@ -31,6 +31,8 @@ import tapesim.Topology as Topology
 import tapesim.PersistencyManager as PersistencyManager
 import tapesim.Report as Report
 
+import tapesim.Debug as debug
+
 # import datatypes required used in this simulation
 import tapesim.datatypes.Request as Request
 
@@ -126,12 +128,16 @@ class Simulation(object):
         pass
 
 
+    def log(self, msg, level=0, tags=[]):                                                    
+        print("[%s] %s" % (self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
+        pass 
+
     def suggest_next_ts(self, timestamp):
         """ Updates the timestamp thats used for the next step."""
         if self.next_ts == None or timestamp < self.next_ts:
             self.next_ts = timestamp
 
-        print("Found next_ts:", self.next_ts)
+        self.log("Found next_ts: " + self.next_ts.strftime("%Y-%m-%d %H:%M:%S.%f"))
 
     def consider_request_ts(self, lst):
         """ Consider requests in lst when determining next timestamp. """
@@ -143,7 +149,7 @@ class Simulation(object):
 
     def submit(self, request):
         """Adds a job to the queue."""
-        print("Simulation.submit(%s)" % repr(request.adr()))
+        self.log("Simulation.submit(%s)" % repr(request.adr()))
         self.INCOMING.append(request)
 
 
@@ -169,7 +175,7 @@ class Simulation(object):
 
     def step(self):
         print("--------------------------------------------------------------")
-        print("Simulation.step()")
+        self.log("Simulation.step()")
         self.print_status()
        
 
@@ -213,7 +219,7 @@ class Simulation(object):
     def process(self):
         """Process requests and reallocate resources if possible."""
         
-        print("Simulation.process()")
+        self.log("Simulation.process()")
 
         self.dump_flow_history = False
 
@@ -233,9 +239,9 @@ class Simulation(object):
         self.INCOMING.sort(key=lambda x: x.time_next_action)
         while len(self.INCOMING):
             if self.INCOMING[0].time_next_action == self.ts:   # or maybe occur time?
-                print("Timestamp: match")
+                self.log("Timestamp: match")
                 request = self.INCOMING.pop(0)
-                print(request)
+                self.log(request)
                 # do nothing with the request :)
                 #self.waiting.append(request) 
 
@@ -247,19 +253,24 @@ class Simulation(object):
                 # Check Cache
                 # Check Network
                 if request.type in WRITE:
-                    print(request.adr(), "is write");
+                    self.log(request.adr() + " is write");
+                    # TODO: set dirty?
+                    self.log(" -> DISKIO")
                     self.DISKIO.append(request) 
                 elif request.type in READ:
-                    print(request.adr(), "is read");
+                    self.log(request.adr() + " is read");
                     if request.is_cached:
-                        print(request.adr(), "is cached");
+                        self.log(request.adr() +  " is cached");
+                        self.log(" -> DISKIO")
                         self.DISKIO.append(request) 
                     else:
-                        print(request.adr(), "is not cached");
+                        self.log(request.adr() + " is not cached");
+                        self.log(" -> TAPEIO")
                         self.TAPEIO.append(request) 
                       
                 # Only start processing request when all required allocations are granted?
                
+
 
                 # DISKIO 
                 #self.NETWORK.append(request) 
@@ -288,12 +299,14 @@ class Simulation(object):
 
 
                     pass
+
                 elif request.type in READ:
                     #self.NETWORK.append(request) 
                     pass
 
                     
 
+                    self.log(" -> DISKIO")
 
 
 
@@ -308,7 +321,7 @@ class Simulation(object):
 
 
             else:
-                print("Timestamp: no match")
+                self.log("Timestamp: No events to process.")
                 # All elements incoming at this time have been handled (list is sorted!).
                 break;
 
@@ -349,22 +362,22 @@ class Simulation(object):
         """
         Print a status summary of the current simulation state.
         """
-        print(" __________")
-        print("/")
-        print("iteration=%d/%d, ts=%s" % (
+        self.log(" __________")
+        self.log("/")
+        self.log("iteration=%d/%d, ts=%s" % (
             self.iteration,
             self.max_iterations,
             str(self.ts)
             ))
         
-        print("Incoming:  ", len(self.INCOMING))
+        self.log("Incoming:  " + str(len(self.INCOMING)))
         self.print_queue(self.INCOMING)
 
-        print("\__________")
-        print("")
+        self.log("\__________")
+        self.log("")
     
 
     def print_queue(self, queue):
         for i, request in enumerate(queue):
-            print(request)
+            self.log(request)
 

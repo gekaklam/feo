@@ -43,7 +43,7 @@ class Request(object):
 
         self.status = ''
         self.tags = set()
-        self.log = []
+        self.logs = []
 
 
         # All about time.
@@ -65,6 +65,7 @@ class Request(object):
 
         # Populate attr for unstable and experimental request properties.
         self.attr = attr
+
         self.attr['analysis'] = None
         self.attr['allocation'] = {'status': None}
 
@@ -74,7 +75,7 @@ class Request(object):
         self.remaining = self.attr['size']
         self.type = attr['type']
 
-        # Network allocations related to this request.
+        # Network allocations related to this request. Required to free allocations later.
         self.flows = []
 
         # Make this request known to the simulation.
@@ -82,6 +83,9 @@ class Request(object):
             simulation.submit(self)
 
         pass
+
+    def log(self, msg):
+        self.logs.append(msg)
 
 
     def changed_allocation(self, best):
