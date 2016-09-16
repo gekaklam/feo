@@ -224,6 +224,10 @@ class Simulation(object):
         # and handle them depending on their next decision?
 
 
+        # TODO: Hooks for callbacks to be called
+        # before step, "within" step, after step
+
+
 
         # We have to consider 
         self.INCOMING.sort(key=lambda x: x.time_next_action)

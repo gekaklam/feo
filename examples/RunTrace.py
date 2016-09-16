@@ -81,8 +81,8 @@ def main():
     #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512_ALTERED-FOR-TESTING-SHORT.out")
     #parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../assets/traces/xferlog.extract.201512_ALTERED-FOR-TESTING.out")
     parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../data/traces/dummy.xferlog")
-    parser.add_argument('--networktopoloy', default="../data/configs/DKRZ.xml")
-    parser.add_argument('--librarytopoloy', default="../data/configs/library_DKRZ.xml")
+    parser.add_argument('--networktopoloy', default="../data/topologies/dummy-network.xml")
+    parser.add_argument('--librarytopoloy', default="../data/topologies/dummy-library.xml")
 
     
 
