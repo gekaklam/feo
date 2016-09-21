@@ -39,31 +39,33 @@ class Cache(tapesim.components.Component.Component):
     """
     # TODO: link to simulation?
 
-    size = None
-    remain = None
-    files = {} # cache is empty on startup
 
     def __init__(self, simulation=None, size=1000, speed=1000):
         super().__init__(simulation=simulation)
 
+        # Cache configuration.
         self.size = size
         self.remain = size
-
-
         self.mode = None
 
-        self.fieldnames = [
-            'datetime',
-            'count'
-        ]
-        self.simulation.report.prepare_report('stages', self.fieldnames)
+        # Cache State.
+        self.files = {} # cache is empty on startup
+
+        # Register CSV report.
+        self.report_name = 'cached_count'
+        self.report_fieldnames = ['datetime', 'count']
+        self.simulation.report.prepare_report(self.report_name, self.report_fieldnames)
 
         pass
 
+
     def clean_cache(self):
-        """docstring for clean_cache"""
+        """
+        Clean up routines to keep the cache tidy.
+
+        """
         
-        files = self.files
+        files = self.files        
 
         for k, v in list(files.items()):
             #print("Check Expired:", files[k])
@@ -72,7 +74,10 @@ class Cache(tapesim.components.Component.Component):
                 del files[k]
 
     def lookup(self, name):
-        """Checks if file exists"""
+        """
+        Checks if file exists
+
+        """
         
         # use lookups also to clean up
         self.clean_cache()
@@ -103,11 +108,11 @@ class Cache(tapesim.components.Component.Component):
 
     def report_stages(self):
         """ Add the current stage count to the stages.csv with current model time. """
-        dic = dict.fromkeys(self.fieldnames)
+        dic = dict.fromkeys(self.report_fieldnames)
 
         dic['datetime'] = str(self.simulation.now())
         dic['count'] = str(len(self.files))
 
-        self.simulation.report.add_report_row('stages', dic)
+        self.simulation.report.add_report_row(self.report_name, dic)
 
 

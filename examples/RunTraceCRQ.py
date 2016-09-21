@@ -117,19 +117,12 @@ def main():
     t = Topology.Topology(sim, network_xml=args.networktopoloy) 
     sim.topology = t 
 
-
+    # Set provider limit (how many requests to process).
     limit = None
-    #limit = 50000
-    #limit = 10000
-    #limit = 1000
-    #limit = 1000
-    #limit = 10
-
-    
     if args.limit:
         limit = args.limit
 
-
+    # Set number of drives
     drives = 60
     if args.drives:
         drives = args.drives
@@ -149,11 +142,6 @@ def main():
     # Open tracefile and register provider
     trace = ProviderXferlog.ProviderXferlog(sim, args.tracefile, limit=limit)
     sim.provider.append(trace)
-
-
-
-
-
 
     
     
@@ -196,6 +184,7 @@ def main():
 			{"type": "LTO-6", "mode": "rw", "position": (1,3,1,8)},
 			{"type": "LTO-6", "mode": "rw", "position": (1,3,1,12)},
 			{"type": "LTO-6", "mode": "rw", "position": (1,5,1,4)},
+
 			{"type": "LTO-6", "mode": "rw", "position": (1,6,1,4)},
 			{"type": "LTO-6", "mode": "rw", "position": (1,6,1,8)},
 			{"type": "LTO-6", "mode": "rw", "position": (1,7,1,4)},
@@ -257,7 +246,7 @@ def main():
     print("==================================================================")
     print(sim.persistency.path)
 
-    print("\nSome commands to quickly inspect this run:")
+    print("\n>> Some commands to quickly inspect this run:")
     print("cd", sim.persistency.path)
     print("nautilus", sim.persistency.path)
 

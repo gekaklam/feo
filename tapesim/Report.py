@@ -19,6 +19,7 @@
 import csv
 import sqlite3
 import os
+import pprint
 
 class Report(object):
 
@@ -60,6 +61,7 @@ class Report(object):
 
 
     def prepare_report(self, name, fieldnames):
+
         if name in self.reports:
             print("ERROR: Report can not be create as a report with that name alread exists.")
             exit(1)

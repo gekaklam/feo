@@ -125,6 +125,20 @@ class Simulation(object):
         self.diskio = IOScheduler.IOScheduler(self)
         self.tapeio = IOScheduler.IOScheduler(self)
 
+
+        # Reports
+        #########
+        
+        # Busy Drives ~= Stages | (perdiodic, thus local extrema may remain unoticed)
+        self.report_busy_drives = 'busy_drives'
+        self.report_busy_drives_fieldnames = ['datetime', 'count']
+        self.report.prepare_report(self.report_busy_drives, self.report_busy_drives_fieldnames)
+
+        # Request Wait-Times | (perdiodic, thus local extrema may remain unoticed)
+        self.report_wait_times = 'wait-times'
+        self.report_wait_times_fieldnames = ['datetime', '1m', '2m', '3m', '4m', '5m', '8m', '10m', '15m', '20m', '30m', '1h', '2h', '4h', '8h', 'more', 'count']
+        self.report.prepare_report(self.report_wait_times, self.report_wait_times_fieldnames)
+
         pass
 
 
@@ -221,7 +235,6 @@ class Simulation(object):
         
         self.log("Simulation.process()")
 
-        self.dump_flow_history = False
 
         # TODO: update active on this timestemp requests or do we have to update more? to reflect state
 
@@ -322,6 +335,12 @@ class Simulation(object):
                 #self.OUTGOING.append(request) 
 
 
+
+
+                self.log("FINALIZE:" + request.adr())
+                request.finalize()
+
+
             else:
                 self.log("Timestamp: No events to process.")
                 # All elements incoming at this time have been handled (list is sorted!).
@@ -331,8 +350,6 @@ class Simulation(object):
     
 
         #######################################################################
-
-
 
 
 
@@ -369,7 +386,7 @@ class Simulation(object):
         self.log("iteration=%d/%d, ts=%s" % (
             self.iteration,
             self.max_iterations,
-            str(self.ts)
+            self.ts.strftime("%Y-%m-%d %H:%M:%S.%f")
             ))
         
         self.log("Incoming:  " + str(len(self.INCOMING)))
