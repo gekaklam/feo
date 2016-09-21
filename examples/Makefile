@@ -6,6 +6,6 @@ setup:
 	mkdir snapshots
 
 
-clear:
+clean:
 	rm -rf visualisation/*
 	rm -rf snapshots/*

@@ -241,6 +241,8 @@ class Simulation(object):
             if self.INCOMING[0].time_next_action == self.ts:   # or maybe occur time?
                 self.log("Timestamp: match")
                 request = self.INCOMING.pop(0)
+
+
                 self.log(request)
                 # do nothing with the request :)
                 #self.waiting.append(request) 
