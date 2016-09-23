@@ -47,10 +47,11 @@ class Request(object):
 
 
         # All about time.
-        self.time_occur  = None
-        self.time_next_action  = None
-        self.time_finished = None
-        self.time_wait = None # accumulated wait time
+        self.time_occur = None        # When did the request occur/reach the I/O server?
+        self.time_finished = None     # Time when the request is served as far as the client is concerned.
+        self.time_wait = None         # Accumulated wait time.
+        self.time_next_action = None  # When does this request changes state the next time.
+                                      #  May vary as transfer speed changes.
 
         if occur:
             self.time_occur = occur
@@ -68,6 +69,7 @@ class Request(object):
 
         self.attr['analysis'] = None
         self.attr['allocation'] = {'status': None}
+    
 
 
         # Unpack attr to stable request properties.
@@ -196,9 +198,55 @@ class Request(object):
 
         self.simulation.report.write_requests([self])
 
+    def dump_analysis(self):
+        """Make snapshot of the file system state."""
+        print("")
+        #self.simulation.log("")
+        
+
+    def analyse(self):
+        """
+        Handle the incoming request.
+        
+        1. Is the file cached?
+        2. Is the file existing in the FileManager?
+        3. Is the tape 
+        
+        """
+       
+        request = self # TODO: clean
+
+        analysis = {'serveable': False, 'cache': None, 'file': None, 'tape': None}
+
+        filename = self.attr['file']
+
+        analysis['cache'] = self.simulation.fc.lookup(filename)
+        analysis['file'] = self.simulation.fm.lookup(filename)
+
+        if analysis['file']:
+            # The file exists, gather information on tape.
+            analysis['tape'] = self.simulation.tm.lookup(analysis['file']['tape'])
+            analysis['tape']['rtime'] = self.simulation.rs.receive_time(analysis['tape']['slot'])
+        else:
+            # allocate tape
+            request.actions = ["ALLOCATE TAPE", "REGISTER FILE"]
+            #self.fm.update(filename)
+
+        if analysis['tape']:
+            # A tape is associeted with this file.
+            pass
+
+            # analysis['tape']['stime'] = drive.get_spool_time(pos=analysis['file']['pos'])
+            # print("     '- Spool time:", analysis['tape']['stime'])
+
+        # Attach analysis to request
+        print("Analysis:", analysis)
+        request.attr['analysis'] = analysis
+
 
     def __str__(self):
         return self.__repr__()
+
 
     def __repr__(self):
         adr = hex(id(self))
@@ -207,7 +255,7 @@ class Request(object):
         info += self.attr['file']
         info += ' @ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
         #info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
-        info += ' next ' +    self.time_next_action.strftime("%H:%M:%S.%f")
+        info += ' -> ' +    self.time_next_action.strftime("%H:%M:%S.%f")
         info += " BYTES REMAINING: " + "%s" % str(self.remaining)
         #info += " ALLOC: " + str(self.attr['allocation'])
         info += " STATUS: " + str(self.status)

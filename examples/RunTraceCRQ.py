@@ -91,6 +91,7 @@ def main():
     parser.add_argument('--config', type=int, help='')
     #parser.add_argument('--snapshot', help='')
 
+
     args = parser.parse_args()
     print(args)
 
@@ -99,8 +100,10 @@ def main():
     user = input("Continue? [Enter]")
 
     # Setup simulation
-    print("")
-    print("== Initiate Simulation ==")
+    print()
+    print("==================================================================")
+    print("== Initialize Simulation =========================================")
+    print("==================================================================")
     sim = Simulation.Simulation(max_iterations=-1)
     #sim = Simulation.Simulation(max_iterations=10)
     #sim = Simulation.Simulation(max_iterations=-1, confirm_step=True)
@@ -110,8 +113,10 @@ def main():
     ###########################################################################
     # Register Components and connect
     ###########################################################################
-    print("")
-    print("== Prepare Topology ==")
+    print()
+    print("==================================================================")
+    print("== Prepare Topology ==============================================")
+    print("==================================================================")
     # load a topology from xml
     #t = Topology.Topology(s, network_xml='configs/network.xml') 
     t = Topology.Topology(sim, network_xml=args.networktopoloy) 
@@ -264,5 +269,5 @@ if __name__ == '__main__':
     main()
     end = time.clock()
     elapsed = end - start
-    print('\nProcess time:', elapsed, 'seconds')
+    print('Process time:', elapsed, 'seconds')
 

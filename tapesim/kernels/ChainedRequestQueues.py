@@ -72,6 +72,8 @@ class Simulation(object):
     drives  = []     # drives
 
     # Queues
+    queues = [] # list of queues?
+
     INCOMING = []
     OUTGOING = []
     
@@ -81,6 +83,8 @@ class Simulation(object):
     ROBOTS  = []
 
     NETWORK = []
+
+    COMPLETE = []
 
     def __init__(self,
             starting_time=datetime.datetime(1,1,1, microsecond=0),
@@ -126,6 +130,10 @@ class Simulation(object):
         self.tapeio = IOScheduler.IOScheduler(self)
 
 
+        # Counters
+        # self.free_drives = 0
+
+
         # Reports
         #########
         
@@ -145,6 +153,8 @@ class Simulation(object):
     def log(self, msg, level=0, tags=[]):                                                    
         if self.ts is not None:
             print("[%s] %s" % (self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
+        elif self.last_ts is not None:
+            print("[%s] %s" % (self.last_ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
         else:
             print("[%s] %s" % ("????-??-?? ??:??:??.??????", msg))
             #print("[%s] %s" % ("           None           ", msg))
@@ -156,6 +166,7 @@ class Simulation(object):
             self.next_ts = timestamp
 
         self.log("Found next_ts: " + self.next_ts.strftime("%Y-%m-%d %H:%M:%S.%f"))
+
 
     def consider_request_ts(self, lst):
         """ Consider requests in lst when determining next timestamp. """
@@ -169,7 +180,6 @@ class Simulation(object):
         """Adds a job to the queue."""
         self.log("Simulation.submit(%s)" % repr(request.adr()))
         self.INCOMING.append(request)
-
 
 
     def start(self):
@@ -230,6 +240,7 @@ class Simulation(object):
 
             # Process events on next time step.
             self.process()
+            self.print_stats()
 
         pass
 
@@ -251,20 +262,20 @@ class Simulation(object):
         # before step, "within" step, after step
 
 
-
         # We have to consider 
+        self.log("while INCOMING")
         self.INCOMING.sort(key=lambda x: x.time_next_action)
         while len(self.INCOMING):
             if self.INCOMING[0].time_next_action == self.ts:   # or maybe occur time?
+                print()
                 self.log("Timestamp: match")
                 request = self.INCOMING.pop(0)
 
-
                 self.log(request)
+                request.analyse()
+
                 # do nothing with the request :)
                 #self.waiting.append(request) 
-
-                request.finalize()
 
 
                 # INCOMING
@@ -329,7 +340,6 @@ class Simulation(object):
 
 
 
-                #self.DISKIO.append(request) 
 
                 #self.INCOMING.append(request) 
                 #self.DISKIO.append(request) 
@@ -349,16 +359,9 @@ class Simulation(object):
                 self.log("Timestamp: No events to process.")
                 # All elements incoming at this time have been handled (list is sorted!).
                 break;
-
-
     
 
         #######################################################################
-
-
-
-
-
         pass
 
 
@@ -374,8 +377,9 @@ class Simulation(object):
         self.tm.dump()
         self.fc.dump()
 
+
     def now(self):
-        """docstring for now"""
+        """ Return the current model time. """
         return self.ts
 
 
@@ -393,14 +397,34 @@ class Simulation(object):
             self.ts.strftime("%Y-%m-%d %H:%M:%S.%f")
             ))
         
-        self.log("Incoming:  " + str(len(self.INCOMING)))
-        self.print_queue(self.INCOMING)
+        self.print_queue("INCOMING")
+        self.print_queue("DISKIO")
+        self.print_queue("TAPEIO")
+        self.print_queue("OUTGOING")
+        self.print_queue("COMPLETE")
 
         self.log("\__________")
         self.log("")
     
 
-    def print_queue(self, queue):
+    def print_queue(self, name):
+        queue = getattr(self, name)
+        self.log("%-10s " % (name + ":") + str(len(queue)))
         for i, request in enumerate(queue):
             self.log(request)
+
+
+
+    def print_stats(self):
+
+        free_drives = []
+        for drive in self.drives:
+            if drive.has_capacity():
+                free_drives.append(drive)
+
+        print()
+        self.log("Statistics:")
+        self.log("Free Drives: %d/%d" % (len(free_drives), len(self.drives)))
+
+        pass
 

@@ -22,6 +22,17 @@ import datetime
 import graph_tool.all as gt
 
 class Component(object):
+    """
+    Components, as in hardware or software components which are required to
+    handle a request to a clients satisfaction.
+
+    A components in general is considered a resource that in principle is
+    limited. Therefor methods for allocation and release of capacity are
+    exposed for every object inheriting Component.
+
+
+    """
+
 
     def __init__(self, simulation=None, name=None):
         self.simulation = simulation     # e.g. to receive model time
@@ -32,12 +43,17 @@ class Component(object):
         if simulation != None:
             self.simulation.components.append(self)
 
+        self.name = name
+
+        # Especially hardware components are relatively tightly coupled with
+        # the topologies which is currently implemented using graphs.
         self.graph = None
         self.nodeidx = None
 
-        self.name = name
+        # 
         self.capacity = 1
         self.max_capacity = 1
+
         pass
 
    
@@ -47,6 +63,7 @@ class Component(object):
             self.capacity += size
         else:
             print("Error: trying to free capacity that was never there!")
+
 
     def allocate_capacity(self, size=1):
         """docstring for block"""
