@@ -31,7 +31,7 @@ class TapeManager(object):
         self.slots = {}
 
         self.tapes = {}
-#         self.tapes = {
+#       self.tapes = {
 #            "t1": {"slot": (1, 1), "free": 500, "type": "u4"},    
 #            "t2": {"slot": (1, 2), "free": 500, "type": "u4"},    
 #            "t3": {"slot": (1, 3), "free": 500, "type": "u4"},    
@@ -171,6 +171,14 @@ class TapeManager(object):
 
         return tid, result
 
+
+    def dump(self):
+        """Make snapshot of the file system state."""
+        print("")
+        self.simulation.log("Dump " + str(self) + " state.")
+        for i, item in enumerate(self.tapes):
+            self.simulation.log("%05d" % i + str(item) + str(self.tapes[item]))
+        self.simulation.log(self.simulation.persistency.path)
 
 
 

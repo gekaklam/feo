@@ -233,9 +233,9 @@ def main():
 
 
     # Dump registered components.
-    print()
-    for c in sim.components:
-        print(c)
+    #print()
+    #for c in sim.components:
+    #    print(c)
 
 
     sim.finalize()

@@ -59,6 +59,9 @@ class Cache(tapesim.components.Component.Component):
         pass
 
 
+
+
+
     def clean_cache(self):
         """
         Clean up routines to keep the cache tidy.
@@ -115,4 +118,11 @@ class Cache(tapesim.components.Component.Component):
 
         self.simulation.report.add_report_row(self.report_name, dic)
 
-
+    def dump(self):
+        """Make snapshot of the file system state."""
+        print("")
+        self.simulation.log("Dump " + str(self) + " state.")
+        for i, item in enumerate(self.files):
+            self.simulation.log("%05d" % i + str(item) + str(self.files[item]))
+        self.simulation.log(self.simulation.persistency.path)
+        

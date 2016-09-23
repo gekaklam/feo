@@ -116,9 +116,10 @@ class FileManager(object):
 
     def dump(self):
         """Make snapshot of the file system state."""
-        print("\nDump", self, "state.")
-        for i, f in enumerate(self.files):
-            print("%05d" % i, f, self.files[f])
-        print(self.simulation.persistency.path)
+        print("")
+        self.simulation.log("Dump " + str(self) + " state.")
+        for i, item in enumerate(self.files):
+            self.simulation.log("%05d" % i + str(item) + str(self.files[item]))
+        self.simulation.log(self.simulation.persistency.path)
         
 

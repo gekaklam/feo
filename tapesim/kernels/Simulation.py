@@ -157,6 +157,15 @@ class Simulation(object):
 
         pass
 
+
+    def log(self, msg, level=0, tags=[]):                                                    
+        if self.ts is not None:
+            print("[%s] %s" % (self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
+        else:
+            print("[%s] %s" % ("????-??-?? ??:??:??.??????", msg))
+            #print("[%s] %s" % ("           None           ", msg))
+
+
     def print_status_short(self):
         """Dump internal state."""
 

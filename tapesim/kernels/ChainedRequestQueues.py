@@ -143,8 +143,12 @@ class Simulation(object):
 
 
     def log(self, msg, level=0, tags=[]):                                                    
-        print("[%s] %s" % (self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
-        pass 
+        if self.ts is not None:
+            print("[%s] %s" % (self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
+        else:
+            print("[%s] %s" % ("????-??-?? ??:??:??.??????", msg))
+            #print("[%s] %s" % ("           None           ", msg))
+
 
     def suggest_next_ts(self, timestamp):
         """ Updates the timestamp thats used for the next step."""
@@ -367,8 +371,8 @@ class Simulation(object):
         print("Simulation.finalize()")
 
         self.fm.dump()
-        #self.tm.dump()
-        #self.fc.dump()
+        self.tm.dump()
+        self.fc.dump()
 
     def now(self):
         """docstring for now"""
