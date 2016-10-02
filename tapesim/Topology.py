@@ -102,13 +102,13 @@ class Topology(object):
         return res, max_flow
 
     def allocate_capacity(self, res):
-        print("Topology.allocate_capacity()")
+        self.log("Topology.allocate_capacity()")
         g = self.graph
         for e in g.edges():
             g.ep['capacity'][e] -= res[e]
 
     def free_capacity(self, res):
-        print("Topology.free_capacity()")
+        self.log("Topology.free_capacity()")
         g = self.graph
         for e in g.edges():
             g.ep['capacity'][e] += res[e]
@@ -121,7 +121,7 @@ class Topology(object):
         s = self.simulation
         g = self.graph
 
-        print("INFO: New network component added:", name)
+        self.log("INFO: New network component added:" + name)
 
 
         # Register a new vertex and add properties
@@ -354,3 +354,9 @@ class Topology(object):
 
 
             output=output)
+
+
+
+
+    def log(self, msg):
+        print("[Topology]", msg)

@@ -81,15 +81,22 @@ def main():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
 
+
     parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../data/traces/dummy.xferlog")
-    parser.add_argument('--networktopoloy', default="../data/topologies/dummy-network.xml")
-    parser.add_argument('--librarytopoloy', default="../data/topologies/dummy-library.xml")
+
+    parser.add_argument('--network-topoloy', default="../data/topologies/dummy-network.xml")
+    parser.add_argument('--library-topoloy', default="../data/topologies/dummy-library.xml")
 
 
-    parser.add_argument('--limit', type=int, help='')
+    parser.add_argument('--limit', type=int, help='', default=-1)
+    parser.add_argument('--limit-iterations', type=int, help='', default=-1)
+
     parser.add_argument('--drives', type=int, help='')
     parser.add_argument('--config', type=int, help='')
     #parser.add_argument('--snapshot', help='')
+
+
+    parser.add_argument("--confirm-step", help="Manually step through the simulation.", action="store_true")
 
 
     args = parser.parse_args()
@@ -104,7 +111,7 @@ def main():
     print("==================================================================")
     print("== Initialize Simulation =========================================")
     print("==================================================================")
-    sim = Simulation.Simulation(max_iterations=-1)
+    sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step)
     #sim = Simulation.Simulation(max_iterations=10)
     #sim = Simulation.Simulation(max_iterations=-1, confirm_step=True)
     #sim = Simulation.Simulation(max_iterations=-1, keep_finished=True, confirm_step=True)
@@ -119,7 +126,7 @@ def main():
     print("==================================================================")
     # load a topology from xml
     #t = Topology.Topology(s, network_xml='configs/network.xml') 
-    t = Topology.Topology(sim, network_xml=args.networktopoloy) 
+    t = Topology.Topology(sim, network_xml=args.network_topoloy) 
     sim.topology = t 
 
     # Set provider limit (how many requests to process).

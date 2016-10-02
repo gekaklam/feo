@@ -90,7 +90,7 @@ class Simulation(object):
             starting_time=datetime.datetime(1,1,1, microsecond=0),
             confirm_step = False,
             keep_finished = False,
-            max_iterations = 100,
+            limit_iterations = 100,
             report = None
         ):
 
@@ -103,7 +103,7 @@ class Simulation(object):
 
 
         # Simulation control and termination
-        self.max_iterations = max_iterations
+        self.limit_iterations = limit_iterations
         self.confirm_step = confirm_step
         self.keep_finished = keep_finished
         self.dump_flow_history = False
@@ -229,7 +229,7 @@ class Simulation(object):
             # TODO: Doesn't this halt the simulation to early?
             print("Simulation halted. Nothing to do.")
             self.halted = True
-        elif self.iteration >= self.max_iterations and self.max_iterations not in ['inf', -1, None]:
+        elif self.iteration >= self.limit_iterations and self.limit_iterations not in ['inf', -1, None]:
             print("Simulation halted. Max iterations reached.")
             self.halted = True
         else:
@@ -287,6 +287,7 @@ class Simulation(object):
                     # TODO: set dirty?
                     self.log(" -> DISKIO")
                     self.DISKIO.append(request) 
+
                 elif request.type in READ:
                     self.log(request.adr() + " is read");
                     if request.is_cached:
@@ -393,7 +394,7 @@ class Simulation(object):
         self.log("/")
         self.log("iteration=%d/%d, ts=%s" % (
             self.iteration,
-            self.max_iterations,
+            self.limit_iterations,
             self.ts.strftime("%Y-%m-%d %H:%M:%S.%f")
             ))
         

@@ -80,7 +80,7 @@ class ProviderXferlog(object):
         num : max number of elements to fetch (except for cases with simultanous events)
 
         """
-        print("ProviderXferlog.fetch(): ", num)
+        self.log("ProviderXferlog.fetch(): %d" % num)
 
         # Fetch num events and keep last event to check timestamp
         # Note: fetch_one will auto-submit to simulation
@@ -117,7 +117,7 @@ class ProviderXferlog(object):
         # Check EOT.
         line = self.tracefile.readline()
         if line == '' or (self.limit != None and self.counter >= self.limit):
-            print("END OF TRACE")
+            self.log("END OF TRACE")
             return None
 
         # Keep track of events provided.
@@ -134,11 +134,11 @@ class ProviderXferlog(object):
        
         # TODO: Too many hosts fix: Max-Flow will become to costly for many hosts. 
         # Quickfix: Map every host randomly to one of only 10 possible hosts.
-        print("Hosts:", len(self.hosts.keys()))
+        self.log("Hosts: %d" % len(self.hosts.keys()))
         clienthost = "%s" % (random.randint(1,10))
 
         if clienthost not in self.hosts.keys():
-            print("Client not present.")
+            self.log("Client not present.")
 
             new_client = self.simulation.topology.register_network_component(name=clienthost, link_capacity=1000)
             self.hosts[clienthost] = new_client
@@ -150,7 +150,11 @@ class ProviderXferlog(object):
 
 
     def report(self):
-        print("Trace.counter=%d" % self.counter)
-        print("Trace.hosts")
+        self.log("Trace.counter=%d" % self.counter)
+        self.log("Trace.hosts")
         pprint.pprint(self.hosts)
+
+
+    def log(self, msg):
+        print("[ProviderXferlog]", msg)
 
