@@ -88,7 +88,7 @@ def main():
     parser.add_argument('--library-topoloy', default="../data/topologies/dummy-library.xml")
 
 
-    parser.add_argument('--limit', type=int, help='', default=-1)
+    parser.add_argument('--limit', type=int, help='', default=None)
     parser.add_argument('--limit-iterations', type=int, help='', default=-1)
 
     parser.add_argument('--drives', type=int, help='')
@@ -106,15 +106,12 @@ def main():
     print("PID:", os.getpid())
     user = input("Continue? [Enter]")
 
-    # Setup simulation
+    
     print()
     print("==================================================================")
     print("== Initialize Simulation =========================================")
     print("==================================================================")
     sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step)
-    #sim = Simulation.Simulation(max_iterations=10)
-    #sim = Simulation.Simulation(max_iterations=-1, confirm_step=True)
-    #sim = Simulation.Simulation(max_iterations=-1, keep_finished=True, confirm_step=True)
 
 
     ###########################################################################
@@ -141,7 +138,7 @@ def main():
 
 
     # Rebuild tape filesystem: 
-    mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=limit)
+    mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=None)
     mkfs.rebuild_filesystem()
 
     print()

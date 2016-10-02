@@ -86,6 +86,7 @@ class Request(object):
 
         pass
 
+
     def log(self, msg):
         self.logs.append(msg)
 
@@ -168,10 +169,10 @@ class Request(object):
 
         # mark file as cached
         # TODO: read vs. write?
-        if self.attr['type'] in ['w', 'write']:
-            self.simulation.fc.set(name=self.attr['file'], modified=self.simulation.now(), persistent=False)
-        else:
-            self.simulation.fc.set(name=self.attr['file'], modified=self.simulation.now())
+        #if self.attr['type'] in ['w', 'write']:
+        #    self.simulation.fc.set(name=self.attr['file'], modified=self.simulation.now(), persistent=False)
+        #else:
+        #    self.simulation.fc.set(name=self.attr['file'], modified=self.simulation.now())
 
 
         # free any allocations

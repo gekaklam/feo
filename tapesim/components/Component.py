@@ -114,3 +114,13 @@ class Component(object):
 
         adr = hex(id(self))
         return '<%s %s: %s>' % (adr, self.__class__.__name__, info)
+
+
+
+    def log(self, *args, level=0, tags=[], **kargs):                                                    
+        print("[%s]" % self.__class__.__name__, *args, **kargs)
+
+    def error(self, *args, level=0, tags=[], **kargs):                                                    
+        print("[%s] ERROR:" % self.__class__.__name__, *args, **kargs)
+        exit(1)
+

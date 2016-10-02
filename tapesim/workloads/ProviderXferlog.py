@@ -25,11 +25,14 @@ import re
 import datetime
 import random
 import pprint
+
 # import datatypes required used in this simulation
+import tapesim.components.Component
 import tapesim.datatypes.Request as Request
 
 
-class ProviderXferlog(object):
+#class ProviderXferlog(object):
+class ProviderXferlog(tapesim.components.Component.Component):
     """ """
     #  0  1   2    3     4        5                  6                      7        8
     #  wd mon      time  year     host               file                   type     bytes
@@ -154,7 +157,4 @@ class ProviderXferlog(object):
         self.log("Trace.hosts")
         pprint.pprint(self.hosts)
 
-
-    def log(self, msg):
-        print("[ProviderXferlog]", msg)
 

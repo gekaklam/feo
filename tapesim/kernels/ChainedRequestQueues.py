@@ -94,6 +94,9 @@ class Simulation(object):
             report = None
         ):
 
+        # Convienience
+        self.simulation = self
+
         # Simulation state
         self.halted = False
         self.iteration = 0
@@ -150,13 +153,13 @@ class Simulation(object):
         pass
 
 
-    def log(self, msg, level=0, tags=[]):                                                    
+    def log(self, *args, level=0, tags=[], **kargs):                                                    
         if self.ts is not None:
-            print("[%s] %s" % (self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
+            print("[%s]" % self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), *args, **kargs)
         elif self.last_ts is not None:
-            print("[%s] %s" % (self.last_ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
+            print("[%s]" % self.last_ts.strftime("%Y-%m-%d %H:%M:%S.%f"), *args, **kargs)
         else:
-            print("[%s] %s" % ("????-??-?? ??:??:??.??????", msg))
+            print("[%s]" % "????-??-?? ??:??:??.??????", *args, **kargs)
             #print("[%s] %s" % ("           None           ", msg))
 
 
@@ -326,13 +329,15 @@ class Simulation(object):
                     #self.DIRTY.append(request)    
                     #self.NETWORK.append(request) 
                     
-                    # 
+                    #  
 
+                    self.fc.set(name=request.attr['file'], modified=self.simulation.now(), dirty=True)
 
                     pass
 
                 elif request.type in READ:
                     #self.NETWORK.append(request) 
+                    self.fc.set(name=request.attr['file'], modified=self.simulation.now(), dirty=False)
                     pass
 
                     
@@ -426,6 +431,7 @@ class Simulation(object):
         print()
         self.log("Statistics:")
         self.log("Free Drives: %d/%d" % (len(free_drives), len(self.drives)))
+        self.log("Cached:      %d/%d (Files/Dirty)" % (len(self.fc.files), self.fc.count_dirty()))
 
         pass
 
