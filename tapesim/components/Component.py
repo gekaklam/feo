@@ -18,8 +18,11 @@
 
 
 import datetime
+import sys
+import traceback
 
 import graph_tool.all as gt
+
 
 class Component(object):
     """
@@ -59,6 +62,7 @@ class Component(object):
    
     def free_capacity(self, size=1):
         print("FREE", self.__repr__())
+
         if (self.capacity + size) <= self.max_capacity:
             self.capacity += size
         else:
@@ -120,7 +124,13 @@ class Component(object):
     def log(self, *args, level=0, tags=[], **kargs):                                                    
         print("[%s]" % self.__class__.__name__, *args, **kargs)
 
+
     def error(self, *args, level=0, tags=[], **kargs):                                                    
+        # Print a stack trace.
+        for line in traceback.format_stack():
+            print(line.strip())
+
+        # Exit with error description.
         print("[%s] ERROR:" % self.__class__.__name__, *args, **kargs)
         exit(1)
 

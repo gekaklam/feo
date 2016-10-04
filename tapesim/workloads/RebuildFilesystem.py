@@ -12,10 +12,11 @@ import random
 
 
 # import datatypes required used in this simulation
+import tapesim.components.Component
 import tapesim.datatypes.Request as Request
 
 
-class RebuildFilesystem(object):
+class RebuildFilesystem(tapesim.components.Component.Component):
     """
     RebuildFilesystem is used to analyse a trace for files which are assumed to
     be archived in the tape system. If no mapper or position generator is provided
@@ -44,7 +45,7 @@ class RebuildFilesystem(object):
 
 
     def sanitize_type(self, typestring):
-        READ = ['PSTO_Cmd', 'STOR_Cmd']
+        READ = ['PSTO_Cmd', 'STOR_Cmtapesim.components.Component.Componentd']
         WRITE = ['PRTR_Cmd', 'RETR_Cmd']
 
         if typestring in READ:
@@ -63,7 +64,7 @@ class RebuildFilesystem(object):
         line = True
         while line:
             line = self.fetch_one()
-            print(self.counter)
+            self.log(self.counter)
             print()
 
         # Reset file position.
@@ -82,7 +83,7 @@ class RebuildFilesystem(object):
         # Check EOT.
         line = self.tracefile.readline()
         if line == '' or (self.limit != None and self.counter >= self.limit):
-            print("END OF TRACE")
+            self.log("END OF TRACE")
             return None
 
         # Keep track of events provided.
@@ -94,7 +95,7 @@ class RebuildFilesystem(object):
         timestamp = datetime.datetime.strptime(date_string, DATE_FORMAT)
         attr = {'file': raw_req[6], 'type': self.sanitize_type(raw_req[7]), 'size': int(raw_req[8])}
 
-        print(attr)
+        self.log(attr)
         
         return self.rebuild_file(attr)
 
@@ -119,16 +120,16 @@ class RebuildFilesystem(object):
         elif attr['type'] in ['read', 'r']:
             # File does not exists and this a read-like request.
             # Default for READ: Precreate file. "Who accesses non existing files?"
-            print("RebuildFilesystem: NEW FILE:")
+            self.log("RebuildFilesystem: NEW FILE:")
 
             # Get a tape allocation.
             tid, t = tm.allocate(attr['size'])   
-            print("tid, t:", tid, tm.tapes[tid])
+            self.log("tid, t:", tid, tm.tapes[tid])
 
             # Register the file to the file system index.
             fm.update(name=attr['file'], tape=tid, size=attr['size'])
             f = fm.lookup(attr['file'])
-            print("f:", f)
+            self.log("f:", f)
 
         else:
             # File does not exists, but access type is non-read.
@@ -136,22 +137,22 @@ class RebuildFilesystem(object):
             # Default for WRITE: Assume file is not present yet. WORM ;)
             # For Write-Once-Read-Many this seems a sensible default.
             # In case of other I/O workloads this maybe to optimisitc.
-            print("RebuildFilesystem: New file but will be written.")
+            self.log("RebuildFilesystem: New file but will be written.")
 
         return True
 
 
     def report(self):
-        print("Reads:  ", self.reads) 
-        print("Writes: ", self.writes) 
-        print("Other:  ", self.other) 
-        print("Total:  ", self.reads + self.writes + self.other)
-        print("Hosts:  ", len(self.hosts)) 
-        print("Files:  ", len(self.files)) 
+        self.log("Reads:  ", self.reads) 
+        self.log("Writes: ", self.writes) 
+        self.log("Other:  ", self.other) 
+        self.log("Total:  ", self.reads + self.writes + self.other)
+        self.log("Hosts:  ", len(self.hosts)) 
+        self.log("Files:  ", len(self.files)) 
 
-        print()
-        print("Size(min):", size_min)
-        print("Size(max):", size_max) 
+        self.log()
+        self.log("Size(min):", size_min)
+        self.log("Size(max):", size_max) 
 
 
 

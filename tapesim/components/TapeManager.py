@@ -19,12 +19,16 @@
 import random
 import math
 
-class TapeManager(object):
+
+
+import tapesim.components.Component
+
+class TapeManager(tapesim.components.Component.Component):
 
 
 
     def __init__(self, simulation):
-        print("TapeManager instance.")
+        self.log("TapeManager instance.")
 
         self.simulation = simulation
 
@@ -134,28 +138,27 @@ class TapeManager(object):
 
         if tid in self.tapes:
             # present check fill
-            print("check fill level")
+            self.log("check fill level")
             result = self.tapes[tid]
         else:
             # new tape
-            print("NEW TAPE:")
+            self.log("NEW TAPE:")
             
-            print("NEW SLOT:")
+            self.log("NEW SLOT:")
             tries = 10
             slot_lim = 300
             slotid = (random.randint(0, slot_lim), random.randint(0, slot_lim))
             while slotid in self.slots and tries > 0:
                 tries -= 1
-                print("SLOT TAKEN:", slotid)
+                self.log("SLOT TAKEN:", slotid)
                 slotid = (random.randint(0, slot_lim), random.randint(0, slot_lim))
 
             if slotid in self.slots:
-                print("ERROR: Tape library overfull. No free slots.")
-                exit()
+                self.error("Tape library overfull. No free slots.")
 
             self.slots[slotid] = {'tape': tid}
 
-            print('slot:', slotid)
+            self.log('slot:', slotid)
 
             self.tapes[tid] = {'free': int(math.pow(1024, 4) * 6), 'slot': slotid}
             result = self.tapes[tid]

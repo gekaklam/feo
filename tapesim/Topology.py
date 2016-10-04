@@ -66,6 +66,24 @@ class Topology(object):
         pass
 
 
+    # Debug auxiliary
+    ###########################################################################
+    def log(self, *args, level=0, tags=[], **kargs):                                                    
+        print("[%s]" % self.__class__.__name__, *args, **kargs)
+
+
+    def error(self, *args, level=0, tags=[], **kargs):                                                    
+        # Print a stack trace.
+        for line in traceback.format_stack():
+            print(line.strip())
+
+        # Exit with error description.
+        print("[%s] ERROR: " % self.__class__.__name__, *args, **kargs)
+        exit(1)
+
+
+    # 
+    ###########################################################################
     def get_path(self, src, tgt):
         g = self.graph
         vlist, elist = gt.shortest_path(g, g.vertex(src), g.vertex(tgt))
@@ -75,12 +93,12 @@ class Topology(object):
     def dump_vertex_property(self, prop):
         g = self.graph
         for v in g.vertices():
-            print(v, ":", prop[v])
+            self.log(v, ":", prop[v])
 
     def dump_edge_property(self, prop):
         g = self.graph
         for e in g.edges():
-            print(e, ":", prop[e])
+            self.log(e, ":", prop[e])
 
 
     def max_flow(self, src, tgt):
@@ -162,7 +180,7 @@ class Topology(object):
 
     def network_from_xml(self, path):
         """Load a network topology from GraphML XML file."""
-        print("Loading network topology from XML:", path)
+        self.log("Loading network topology from XML:", path)
 
         self.graph = gt.load_graph(path)
 
@@ -192,9 +210,9 @@ class Topology(object):
         #print()
 
         # Instanciate tape-sim components from graph
-        print("Instanciating components:")
+        self.log("Instanciating components:")
         for v in g.vertices():
-            print(v, g.vp.name[v], g.vp['eval'][v], g.vp['_graphml_vertex_id'][v])
+            self.log(v, g.vp.name[v], g.vp['eval'][v], g.vp['_graphml_vertex_id'][v])
             classname = g.vp.name[v].split(":")[0]
           
             # find client/node switch
@@ -212,14 +230,14 @@ class Topology(object):
             if g.vp['eval'][v]:
                 obj = eval(g.vp['eval'][v])
             else:
-                print(classname)
+                self.log(classname)
                 obj = eval("%s.%s(s)" % (classname,classname))
 
             if obj != None:
                 obj.graph = g
                 obj.nodeidx = int(v)
                 g.vp.obj[v] = obj
-                print(" '- created:", obj)
+                self.log(" '- created:", obj)
             print()
 
 
@@ -265,8 +283,8 @@ class Topology(object):
 
         # inspect graph
         for v in g.vertices():
-            print(v, "obj:", g.vp['obj'][v], " <-> ")
-            print(v, "name:", g.vp['name'][v])
+            self.log(v, "obj:", g.vp['obj'][v], " <-> ")
+            self.log(v, "name:", g.vp['name'][v])
      
 
     def draw_graph(self, e_label, output, v_label='idx'):
@@ -357,6 +375,3 @@ class Topology(object):
 
 
 
-
-    def log(self, msg):
-        print("[Topology]", msg)

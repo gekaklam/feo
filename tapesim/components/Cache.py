@@ -157,17 +157,17 @@ class Cache(tapesim.components.Component.Component):
         if size != None:
             self.files[name]['size'] = size
         else:
-            self.error("Size not specified.")
+            self.error("Entry size not specified.")
 
         if modified != None:
             self.files[name]['modified'] = modified
         else:
-            self.error("Modfied not specified.")
+            self.error("Entry modfied attribute not specified.")
 
         if dirty != None:
             self.files[name]['dirty'] = dirty
         else:
-            self.error("Dirty flog not specified.")
+            self.error("Entry dirty flog not specified.")
 
 
         # stages changes, so log that for late analyis
