@@ -35,7 +35,7 @@ as follows:
 Build and install using the following instructions:
 
 	export PYTHON=/usr/bin/python3
-	./configure --with-boost-python=boost_python3 --disable-cairo
+	./configure --with-boost-python=boost_python3
 	make
 	sudo make install
 
