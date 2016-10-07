@@ -28,6 +28,7 @@ class TapeManager(tapesim.components.Component.Component):
 
 
     def __init__(self, simulation):
+        super().__init__(simulation=simulation)
         self.log("TapeManager instance.")
 
         self.simulation = simulation
@@ -178,9 +179,9 @@ class TapeManager(tapesim.components.Component.Component):
     def dump(self):
         """Make snapshot of the file system state."""
         print("")
-        self.simulation.log("Dump " + str(self) + " state.")
+        self.simulation.log("Dump ", str(self), " state.")
         for i, item in enumerate(self.tapes):
-            self.simulation.log("%05d" % i + str(item) + str(self.tapes[item]))
+            self.simulation.log("%05d" % i, item, self.tapes[item])
         self.simulation.log(self.simulation.persistency.path)
 
 

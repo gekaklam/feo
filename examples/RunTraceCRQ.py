@@ -138,6 +138,7 @@ def main():
 
 
     # Rebuild tape filesystem: 
+    print()
     mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=None)
     mkfs.rebuild_filesystem()
 

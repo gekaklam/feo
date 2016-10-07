@@ -21,6 +21,7 @@ import cairo
 
 # import datatypes required used in this simulation
 import tapesim.datatypes.Request as Request
+import tapesim.components.Component
 
 # import hardware components required for this example
 import tapesim.components.Client as Client
@@ -35,11 +36,11 @@ import tapesim.components.FileManager as FileManager
 import tapesim.components.TapeManager as TapeManager
 
 
-class Topology(object):
+class Topology(tapesim.components.Component.Component):
 
     def __init__(self, simulation, network_xml=None, tape_xml=None):
+        super().__init__(simulation=simulation)
 
-        self.simulation = simulation
         self.network = None
         self.tape = None
 
@@ -69,7 +70,7 @@ class Topology(object):
     # Debug auxiliary
     ###########################################################################
     def log(self, *args, level=0, tags=[], **kargs):                                                    
-        print("[%s]" % self.__class__.__name__, *args, **kargs)
+        self.simulation.log("[%s]" % self.__class__.__name__, *args, **kargs)
 
 
     def error(self, *args, level=0, tags=[], **kargs):                                                    
@@ -132,14 +133,14 @@ class Topology(object):
             g.ep['capacity'][e] += res[e]
 
 
-    def register_network_component(self, name="NetworkComponent", attach_to=None, link_capacity=10, drive=False):
+    def register_network_component(self, name="NetworkComponent", attach_to=None, link_capacity=10, link_latency=0, drive=False):
         """
         Add a new network component to the topology.
         """
         s = self.simulation
         g = self.graph
 
-        self.log("INFO: New network component added:" + name)
+        self.log("INFO: New network component added:", name)
 
 
         # Register a new vertex and add properties
@@ -188,7 +189,7 @@ class Topology(object):
         g = self.graph
 
         # Make network full-duplex.
-        print("Consider all connections full-duplex (=> make graph symetric)")
+        self.log("Consider all connections full-duplex (=> make graph symetric)")
         edges = []
         for e in g.edges():
             #edges.append((e.source(), e.target(), g.ep.weight[e]))
@@ -203,6 +204,7 @@ class Topology(object):
         # Add properties to graph needed for network simulation
         g.vertex_properties['obj'] = g.new_vertex_property("python::object")
         g.edge_properties['capacity'] = g.ep['weight'].copy()
+        g.edge_properties['latency'] = g.ep['weight'].copy()
 
         # dump status of edges
         #for e in g.edges():

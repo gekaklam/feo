@@ -275,6 +275,8 @@ class Simulation(object):
                 request = self.INCOMING.pop(0)
 
                 self.log(request)
+
+                request.log_status("Received")
                 request.analyse()
 
                 # do nothing with the request :)
@@ -290,16 +292,18 @@ class Simulation(object):
                     # TODO: set dirty?
                     self.log(" -> DISKIO")
                     self.DISKIO.append(request) 
+                    request.log_status("Enqueue for Client -> Disk I/O")
 
                 elif request.type in READ:
                     self.log(request.adr() + " is read");
                     if request.is_cached:
                         self.log(request.adr() +  " is cached");
                         self.log(" -> DISKIO")
+                        request.log_status("Enqueue for Disk I/O -> Client")
                         self.DISKIO.append(request) 
                     else:
                         self.log(request.adr() + " is not cached");
-                        self.log(" -> TAPEIO")
+                        request.log_status("Enqueue for Tape I/O -> Disk I/O")
                         self.TAPEIO.append(request) 
                       
                 # Only start processing request when all required allocations are granted?
@@ -331,13 +335,17 @@ class Simulation(object):
                     
                     #  
 
-                    self.fc.set(name=request.attr['file'], modified=self.simulation.now(), dirty=True)
-
+                    size = request.attr['size']
+                    name = request.attr['file']
+                    self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=False)
                     pass
 
                 elif request.type in READ:
                     #self.NETWORK.append(request) 
-                    self.fc.set(name=request.attr['file'], modified=self.simulation.now(), dirty=False)
+                    print(request.attr)
+                    size = request.attr['size']
+                    name = request.attr['file']
+                    self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=False)
                     pass
 
                     
@@ -431,7 +439,11 @@ class Simulation(object):
         print()
         self.log("Statistics:")
         self.log("Free Drives: %d/%d" % (len(free_drives), len(self.drives)))
-        self.log("Cached:      %d/%d (Files/Dirty)" % (len(self.fc.files), self.fc.count_dirty()))
+
+        fc = self.fc
+        factor = 1024*1024*1024 # kilo * mega * giga
+        self.log("Cached:      %d/%d (%d, %d) (Files/Dirty)" % (
+            fc.remain/factor, fc.size/factor, len(fc.files), fc.count_dirty()))
 
         pass
 

@@ -158,12 +158,16 @@ class Simulation(object):
         pass
 
 
-    def log(self, msg, level=0, tags=[]):                                                    
+    def log(self, *args, level=0, tags=[], **kargs):                                                    
         if self.ts is not None:
-            print("[%s] %s" % (self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), msg))
+            print("[%s]" % self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), *args, **kargs)
+        elif self.last_ts is not None:
+            print("[%s]" % self.last_ts.strftime("%Y-%m-%d %H:%M:%S.%f"), *args, **kargs)
         else:
-            print("[%s] %s" % ("????-??-?? ??:??:??.??????", msg))
+            print("[%s]" % "????-??-?? ??:??:??.??????", *args, **kargs)
             #print("[%s] %s" % ("           None           ", msg))
+
+
 
 
     def print_status_short(self):

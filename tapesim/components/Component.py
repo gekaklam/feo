@@ -122,7 +122,7 @@ class Component(object):
 
 
     def log(self, *args, level=0, tags=[], **kargs):                                                    
-        print("[%s]" % self.__class__.__name__, *args, **kargs)
+        self.simulation.log("[%s]" % self.__class__.__name__, *args, **kargs)
 
 
     def error(self, *args, level=0, tags=[], **kargs):                                                    

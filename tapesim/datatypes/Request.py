@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import datetime
+import pprint
 
 
 READ = ['read', 'r', 'WRITE', 'W']
@@ -43,7 +44,7 @@ class Request(object):
 
         self.status = ''
         self.tags = set()
-        self.logs = []
+        self.status_log = []
 
 
         # All about time.
@@ -87,8 +88,20 @@ class Request(object):
         pass
 
 
-    def log(self, msg):
-        self.logs.append(msg)
+    def print_status_log(self):
+        print()
+        print("Status log for", self.adr())
+        for i, entry in enumerate(self.status_log):
+            print(" '- Status %d:" % i, entry['timestamp'].strftime("%Y-%m-%d %H:%M:%S.%f"), entry['msg'])
+        print()
+
+
+    def log_status(self, msg):
+        self.simulation.log(self.adr(), "LOG STATUS:", msg)
+        self.status_log.append({"timestamp": self.simulation.now(), "msg": msg})
+
+        self.print_status_log()
+
 
 
     def changed_allocation(self, best):
@@ -107,7 +120,7 @@ class Request(object):
             self.attr['allocation'] = best
             # merge allocaitons 
             self.attr['allocation']['max_flow'] += max_flow
-            for e in self.simulation.topology.graph.edges():
+            for e in self.scapacityimulation.topology.graph.edges():
                 self.attr['allocation']['res'][e] += res[e]
 
         self.flows.append({
@@ -252,7 +265,7 @@ class Request(object):
     def __repr__(self):
         adr = hex(id(self))
         info = ''
-        info += self.type + ' '
+        info += self.type[:3] + ' '
         info += self.attr['file']
         info += ' @ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
         #info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
