@@ -37,6 +37,13 @@ class FileManager(object):
         else:
             return False
 
+
+    def scan(self, entry):
+        """Scan the data structure for a entry"""
+        pass
+
+
+
     def update(self, name, tape=None, size=None, pos=0):
         # create entry if not existent
         if not (name in self.files):

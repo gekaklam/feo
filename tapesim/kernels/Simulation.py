@@ -123,8 +123,8 @@ class Simulation(object):
         self.io = IOScheduler.IOScheduler(self)
 
         # counter
-        self.rids = 0
-
+        self.rids = 0 # Requests IDs    
+        self.tids = 0 # Transfer IDs   
 
         self.dump_flow_history = False
 
@@ -540,7 +540,6 @@ class Simulation(object):
                         r['tape']['stime'] = drive.get_spool_time(pos=r['file']['pos'])
                         print("     '- Spool time:", r['tape']['stime'])
 
-
                         # find path from drive to client
                         src, tgt = drive.nodeidx, request.client.nodeidx
 
@@ -772,4 +771,19 @@ class Simulation(object):
         self.fm.dump()
         #self.tm.dump()
         #self.fc.dump()
-        
+       
+
+
+
+    # ID provision
+    def get_rid(self):
+        """ Request IDs """
+        new_tid = self.tids
+        self.tids += 1
+        return new_tid
+
+    def get_tid(self):
+        """ Tranfer IDs """
+        new_tid = self.tids
+        self.tids += 1
+        return new_tid

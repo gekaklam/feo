@@ -115,7 +115,9 @@ class Simulation(object):
         # Simulation Event Provider
         self.provider = []
         self.provider_batch_limit = 10
-        self.rids = 0 # request IDs    
+
+        self.rids = 0 # Requests IDs    
+        self.tids = 0 # Transfer IDs    
 
 
         # Analysis and reporting helpers
@@ -132,7 +134,10 @@ class Simulation(object):
         self.diskio = IOScheduler.IOScheduler(self)
         self.tapeio = IOScheduler.IOScheduler(self)
 
-
+    def get_tid(self):
+        new_tid = self.tids
+        self.tids += 1
+        return new_tid
         # Counters
         # self.free_drives = 0
 
@@ -239,6 +244,7 @@ class Simulation(object):
             self.iteration += 1
             # proceed to next step
             if self.confirm_step:
+                self.topology.draw_graph('capacity', 'visualisation/waiting-for-user-confirmation.pdf')
                 user = input("Continue? [Enter]")
 
             # Process events on next time step.
@@ -294,6 +300,12 @@ class Simulation(object):
                     self.DISKIO.append(request) 
                     request.log_status("Enqueue for Client -> Disk I/O")
 
+
+
+
+                    self.TAPEIO.append(request) 
+
+
                 elif request.type in READ:
                     self.log(request.adr() + " is read");
                     if request.is_cached:
@@ -304,8 +316,29 @@ class Simulation(object):
                     else:
                         self.log(request.adr() + " is not cached");
                         request.log_status("Enqueue for Tape I/O -> Disk I/O")
-                        self.TAPEIO.append(request) 
-                      
+
+
+
+                     
+
+                src, tgt = request.client.nodeidx, self.servers[0].nodeidx
+                res, max_flow = self.topology.max_flow(src, tgt)
+
+                print(" Transfer:", src, "to", tgt)
+                print("     '- Max-Flow:", max_flow)
+                print("     '- Res:", res)
+
+
+                print(request.adr(), "next_action:", request.time_next_action)
+
+
+                #best = {'max_flow': max_flow, 'res': res, 'drive': None}
+                #request.changed_allocation(best)
+
+
+                print(request.adr(), "next_action:", request.time_next_action)
+
+
                 # Only start processing request when all required allocations are granted?
                
 
@@ -337,7 +370,11 @@ class Simulation(object):
 
                     size = request.attr['size']
                     name = request.attr['file']
-                    self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=False)
+                    self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=True)
+
+                    request.log_status("Staged in Cache. (Dirty)")
+                    request.log_status("Completed for client.")
+
                     pass
 
                 elif request.type in READ:
@@ -346,6 +383,7 @@ class Simulation(object):
                     size = request.attr['size']
                     name = request.attr['file']
                     self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=False)
+                    request.log_status("Staged in Cache. (Read)")
                     pass
 
                     
@@ -446,4 +484,20 @@ class Simulation(object):
             fc.remain/factor, fc.size/factor, len(fc.files), fc.count_dirty()))
 
         pass
+
+
+
+
+    # ID provision
+    def get_rid(self):
+        """ Request IDs """
+        new_tid = self.tids
+        self.tids += 1
+        return new_tid
+
+    def get_tid(self):
+        """ Tranfer IDs """
+        new_tid = self.tids
+        self.tids += 1
+        return new_tid
 

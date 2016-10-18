@@ -12,7 +12,7 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-#
+#detailsRequ
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -23,42 +23,31 @@ import pprint
 READ = ['read', 'r', 'WRITE', 'W']
 WRITE = ['write', 'w', 'WRITE', 'W']
 
-class Request(object):
+class Transfer(object):
     """
     Requests are used to 
     """
 
-    def __init__(self, simulation=None, client=None, occur=None, attr={}):
+    def __init__(self, simulation=None, request=None, src=None, tgt=None, attr={}):
+
+
         self.simulation = simulation
-        self.client = client
+        self.request = request
+        self.id = simulation.get_tid()
 
-        self.id = simulation.get_rid()
-
-        # Request state.
+        # Transfer state and general information.
+        self.src = src
+        self.tgt = tgt
         self.type = None
         self.remaining = None
-        self.is_cached = None
-        self.persistend = False
-        self.action = None
 
-        self.status = ''
-        self.tags = set()
-        self.status_log = []
+        
+        # self.waiting_for_me     to report back to any component/request which is waiting for this to complete? 
+        # maybe also wait for me to reach byte x? for direct dependant forwarding ?? :/
 
 
-        # All about time.
-        self.time_occur = None        # When did the request occur/reach the I/O server?
-        self.time_finished = None     # Time when the request is served as far as the client is concerned.
-        self.time_wait = None         # Accumulated wait time.
         self.time_next_action = None  # When does this request changes state the next time.
                                       #  May vary as transfer speed changes.
-
-        if occur:
-            self.time_occur = occur
-        elif self.simulation != None:
-            self.time_occur = simulation.now()  # should be true for most cases?
-        else:
-            print("Warning: free-floating request.")
 
         # Used by the simulation to determine next timestep.
         self.time_next_action = self.time_occur
@@ -67,10 +56,8 @@ class Request(object):
         # Populate attr for unstable and experimental request properties.
         self.attr = attr
 
-        self.attr['analysis'] = None
         self.attr['allocation'] = {'status': None}
     
-
 
         # Unpack attr to stable request properties.
         # Add attributes used during book-keeping.
@@ -80,32 +67,13 @@ class Request(object):
         # Network allocations related to this request. Required to free allocations later.
         self.flows = []
 
-        # Make this request known to the simulation.
-        simulation.tids += 1
-        if simulation != None:
-            simulation.submit(self)
-
         pass
 
-
-    def print_status_log(self):
-        print()
-        print("Status log for", self.adr())
-        for i, entry in enumerate(self.status_log):
-            print(" '- Status %d:" % i, entry['timestamp'].strftime("%Y-%m-%d %H:%M:%S.%f"), entry['msg'])
-        print()
-
-
-    def log_status(self, msg):
-        self.simulation.log(self.adr(), "LOG STATUS:", msg)
-        self.status_log.append({"timestamp": self.simulation.now(), "msg": msg})
-
-        self.print_status_log()
 
 
 
     def changed_allocation(self, best):
-        print(self.adr(), "changed allocation")
+        #print(self.adr(), "changed allocation")
 
         #print("EXISTING ALLOC", self.__repr__()) 
 
@@ -120,7 +88,7 @@ class Request(object):
             self.attr['allocation'] = best
             # merge allocaitons 
             self.attr['allocation']['max_flow'] += max_flow
-            for e in self.simulation.topology.graph.edges():
+            for e in self.scapacityimulation.topology.graph.edges():
                 self.attr['allocation']['res'][e] += res[e]
 
         self.flows.append({
@@ -161,7 +129,6 @@ class Request(object):
         """
         Calculate when the next status change will happen for this request.
         """
-
         seconds = self.remaining / (self.attr['allocation']['max_flow'] * 1024*1024)
         microseconds = seconds*1000000
         duration = datetime.timedelta(microseconds=microseconds)
@@ -219,44 +186,6 @@ class Request(object):
         #self.simulation.log("")
         
 
-    def analyse(self):
-        """
-        Handle the incoming request.
-        
-        1. Is the file cached?
-        2. Is the file existing in the FileManager?
-        3. Is the tape 
-        
-        """
-       
-        request = self # TODO: clean
-
-        analysis = {'serveable': False, 'cache': None, 'file': None, 'tape': None}
-
-        filename = self.attr['file']
-
-        analysis['cache'] = self.simulation.fc.lookup(filename)
-        analysis['file'] = self.simulation.fm.lookup(filename)
-
-        if analysis['file']:
-            # The file exists, gather information on tape.
-            analysis['tape'] = self.simulation.tm.lookup(analysis['file']['tape'])
-            analysis['tape']['rtime'] = self.simulation.rs.receive_time(analysis['tape']['slot'])
-        else:
-            # allocate tape
-            request.actions = ["ALLOCATE TAPE", "REGISTER FILE"]
-            #self.fm.update(filename)
-
-        if analysis['tape']:
-            # A tape is associeted with this file.
-            pass
-
-            # analysis['tape']['stime'] = drive.get_spool_time(pos=analysis['file']['pos'])
-            # print("     '- Spool time:", analysis['tape']['stime'])
-
-        # Attach analysis to request
-        print("Analysis:", analysis)
-        request.attr['analysis'] = analysis
 
 
     def __str__(self):

@@ -31,13 +31,23 @@ class IOServer(tapesim.components.Component.Component):
     cache = None
     throughput = None
 
-    def __init__(self, simulation, has_cache=False, throughput=100):
+    def __init__(self, simulation, has_cache=False, throughput=100, from_xml=False):
         super().__init__(simulation=simulation)
 
+
+        # Register to storage system as I/O server.
+        self.simulation.servers.append(self)
+
+        # Initialize cache if has_cache is set.
         if has_cache:
             self.cache = Cache.Cache()
+       
         
         self.throughput = throughput
+
+
+        #register_network_component(self, name="NetworkComponent", attach_to=None, link_capacity=self.throughput, link_latency=0, drive=False):
+
 
         pass
 
