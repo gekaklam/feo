@@ -35,6 +35,7 @@ import tapesim.Debug as debug
 
 # import datatypes required used in this simulation
 import tapesim.datatypes.Request as Request
+import tapesim.datatypes.Transfer as Transfer
 
 # import hardware components required for this example
 import tapesim.components.Client as Client
@@ -126,7 +127,8 @@ class Simulation(object):
 
 
         # Various tape related controller and management facilities
-        self.fc = Cache.Cache(self, size=math.pow(1024, 5)*5) # 5 PB shared disk cache
+        #self.fc = Cache.Cache(self, size=math.pow(1024, 5)*5) # 5 PB shared disk cache
+        self.fc = None
         self.fm = FileManager.FileManager(self)
         self.tm = TapeManager.TapeManager(self)
         self.rs = RobotScheduler.RobotScheduler(self) 
@@ -209,6 +211,7 @@ class Simulation(object):
             self.step()
 
 
+
     def step(self):
         print("--------------------------------------------------------------")
         self.log("Simulation.step()")
@@ -219,6 +222,7 @@ class Simulation(object):
         if len(self.INCOMING) < self.provider_batch_limit:
             for provider in self.provider:
                 provider.fetch_batch(self.provider_batch_limit-len(self.INCOMING))
+
        
         # Find very next event from possible candidates.
         self.consider_request_ts(self.INCOMING)
@@ -237,6 +241,7 @@ class Simulation(object):
             # TODO: Doesn't this halt the simulation to early?
             print("Simulation halted. Nothing to do.")
             self.halted = True
+
         elif self.iteration >= self.limit_iterations and self.limit_iterations not in ['inf', -1, None]:
             print("Simulation halted. Max iterations reached.")
             self.halted = True
@@ -263,6 +268,7 @@ class Simulation(object):
         # TODO: update active on this timestemp requests or do we have to update more? to reflect state
 
 
+
         # maybe collect one large list of happening events
         # and handle them depending on their next decision?
 
@@ -271,7 +277,6 @@ class Simulation(object):
         # before step, "within" step, after step
 
 
-        # We have to consider 
         self.log("while INCOMING")
         self.INCOMING.sort(key=lambda x: x.time_next_action)
         while len(self.INCOMING):
@@ -300,8 +305,15 @@ class Simulation(object):
                     self.DISKIO.append(request) 
                     request.log_status("Enqueue for Client -> Disk I/O")
 
+                    t = Transfer.Transfer(self, request, src=request.client, tgt=self.fc, size=request.size)
+                    print(t)
+                    t.renew_allocation()
+                    print(t)
 
-
+                    # exists? -> create
+                    # displace cache
+                    # transfer client to cache
+                    
 
                     self.TAPEIO.append(request) 
 
@@ -312,21 +324,16 @@ class Simulation(object):
                         self.log(request.adr() +  " is cached");
                         self.log(" -> DISKIO")
                         request.log_status("Enqueue for Disk I/O -> Client")
+
+
+                        t = Transfer.Transfer(self, request, src=self.fc, tgt=request.client, size=request.size)
+
                         self.DISKIO.append(request) 
                     else:
                         self.log(request.adr() + " is not cached");
                         request.log_status("Enqueue for Tape I/O -> Disk I/O")
 
 
-
-                     
-
-                src, tgt = request.client.nodeidx, self.servers[0].nodeidx
-                res, max_flow = self.topology.max_flow(src, tgt)
-
-                print(" Transfer:", src, "to", tgt)
-                print("     '- Max-Flow:", max_flow)
-                print("     '- Res:", res)
 
 
                 print(request.adr(), "next_action:", request.time_next_action)

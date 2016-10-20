@@ -45,7 +45,7 @@ class Cache(tapesim.components.Component.Component):
     # TODO: link to simulation?
 
 
-    def __init__(self, simulation=None, size=1000, speed=1000, replacement_strategy=None):
+    def __init__(self, simulation=None, size=1000, speed=100000, replacement_strategy=None, replace_sim_fc=False):
         super().__init__(simulation=simulation)
 
         # Cache configuration.
@@ -63,13 +63,18 @@ class Cache(tapesim.components.Component.Component):
         self.report_fieldnames = ['datetime', 'count', 'dirty']
         self.simulation.report.prepare_report(self.report_name, self.report_fieldnames)
 
+
+        if replace_sim_fc == True:
+            print("INFO: Replaced default file cache!")
+            self.simulation.fc = self
+
         pass
 
 
 
-    def replace(self, size):
+    def replace(self, size, name=None):
         """ Replace enough files to accomodate size. """
-        
+       
         if self.replacement_strategy.lower() in ['lru', 'least recently used', 'least-recently used']:
            pass 
 

@@ -19,6 +19,8 @@
 import graph_tool.all as gt
 import cairo
 
+import math
+
 # import datatypes required used in this simulation
 import tapesim.datatypes.Request as Request
 import tapesim.components.Component
@@ -152,11 +154,13 @@ class Topology(tapesim.components.Component.Component):
             new_comp = Drive.Drive(s)
         else:
             new_comp = Client.Client(s)
-        
+       
+
         # Associate topology vertices and simulation components with each other.
         g.vp['obj'][v] = new_comp
         new_comp.nodeidx = int(v)
         new_comp.graph = g
+
 
         # By default attach new drives to the driveswitch.
         if drive and self.driveswitch != None and attach_to == None:
@@ -165,6 +169,7 @@ class Topology(tapesim.components.Component.Component):
         # By default attach other network components to the nodeswitch if attach_to is not set.
         if self.nodeswitch != None and attach_to == None:
             attach_to = self.nodeswitch
+
 
         # Make connections full-duplex
         if attach_to != None:
@@ -292,6 +297,9 @@ class Topology(tapesim.components.Component.Component):
     def draw_graph(self, e_label, output, v_label='idx'):
         """
         Helper for convienient and consistent graph drawing.
+
+
+        @param output   filepath of desired output file (pdf)
         """
 
         s = self.simulation

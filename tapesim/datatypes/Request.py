@@ -28,7 +28,7 @@ class Request(object):
     Requests are used to 
     """
 
-    def __init__(self, simulation=None, client=None, occur=None, attr={}):
+    def __init__(self, simulation=None, client=None, occur=None, size=None, attr={}):
         self.simulation = simulation
         self.client = client
 
@@ -36,6 +36,7 @@ class Request(object):
 
         # Request state.
         self.type = None
+        self.size = None
         self.remaining = None
         self.is_cached = None
         self.persistend = False
@@ -74,7 +75,8 @@ class Request(object):
 
         # Unpack attr to stable request properties.
         # Add attributes used during book-keeping.
-        self.remaining = self.attr['size']
+        self.size = attr['size']
+        self.remaining = attr['size']
         self.type = attr['type']
 
         # Network allocations related to this request. Required to free allocations later.
@@ -86,6 +88,23 @@ class Request(object):
             simulation.submit(self)
 
         pass
+
+
+
+    def write_lifecycle(self):
+        pass
+
+
+    def read_lifecycle(self):
+        pass
+
+
+
+
+    def wait_for(self, dependancy):
+
+        pass
+
 
 
     def print_status_log(self):

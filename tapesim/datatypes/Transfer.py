@@ -28,8 +28,11 @@ class Transfer(object):
     Requests are used to 
     """
 
-    def __init__(self, simulation=None, request=None, src=None, tgt=None, attr={}):
+    def __init__(self, simulation=None, request=None, src=None, tgt=None, size=None):
 
+
+        print("New Transfer:", src, "to", tgt)
+        print("New Transfer:", src.nodeidx, "to", tgt.nodeidx)
 
         self.simulation = simulation
         self.request = request
@@ -38,36 +41,44 @@ class Transfer(object):
         # Transfer state and general information.
         self.src = src
         self.tgt = tgt
-        self.type = None
-        self.remaining = None
+        self.status = None
+        self.size = size
+        self.remaining = self.size
 
         
         # self.waiting_for_me     to report back to any component/request which is waiting for this to complete? 
         # maybe also wait for me to reach byte x? for direct dependant forwarding ?? :/
+        self.waiting_for_me = []
 
-
+        self.time_occur = self.simulation.now()
+        self.time_begin = None
+        self.time_finished = None
         self.time_next_action = None  # When does this request changes state the next time.
-                                      #  May vary as transfer speed changes.
-
-        # Used by the simulation to determine next timestep.
-        self.time_next_action = self.time_occur
+                                      # May vary as transfer speed changes.
 
 
-        # Populate attr for unstable and experimental request properties.
-        self.attr = attr
-
-        self.attr['allocation'] = {'status': None}
+        self.allocation = {'status': None}
     
-
-        # Unpack attr to stable request properties.
-        # Add attributes used during book-keeping.
-        self.remaining = self.attr['size']
-        self.type = attr['type']
 
         # Network allocations related to this request. Required to free allocations later.
         self.flows = []
 
         pass
+
+
+    
+    def renew_allocation(self):
+        """ Get or renew the current network allocation. """
+
+        # find path source to target
+        res, max_flow = self.simulation.topology.max_flow(self.src.nodeidx, self.tgt.nodeidx)
+        
+        print(" Transfer:", self.src, "to", self.tgt)
+        print("     '- Max-Flow:", max_flow)
+        print("     '- Res:", res)
+
+        best = {'max_flow': max_flow, 'res': res}
+        self.changed_allocation(best)
 
 
 
@@ -77,22 +88,23 @@ class Transfer(object):
 
         #print("EXISTING ALLOC", self.__repr__()) 
 
-        if self.attr['allocation']['status'] == None:
-            self.attr['allocation'] = best
+        if self.allocation['status'] == None:
+            self.allocation = best
 
         else:
             # remember old allocations
-            res = self.attr['allocation']['res']
-            max_flow = self.attr['allocation']['max_flow']
+            res = self.allocation['res']
+            max_flow = self.allocation['max_flow']
             # overwrite with allocations 
-            self.attr['allocation'] = best
+            self.allocation = best
             # merge allocaitons 
-            self.attr['allocation']['max_flow'] += max_flow
-            for e in self.scapacityimulation.topology.graph.edges():
-                self.attr['allocation']['res'][e] += res[e]
+            self.allocation['max_flow'] += max_flow
+            for e in self.simulation.topology.graph.edges():
+                self.allocation['res'][e] += res[e]
 
+        # we assume flows are never stolen until transfer completes
         self.flows.append({
-            'max_flow': self.attr['allocation']['max_flow'], 
+            'max_flow': self.allocation['max_flow'], 
             'time': self.simulation.now()
             })
 
@@ -109,7 +121,7 @@ class Transfer(object):
 
         if duration.total_seconds() > 0.0:
             # TODO: variable serve rate
-            bytes_served = (duration.total_seconds() + (duration.microseconds/1000000)) * (self.attr['allocation']['max_flow'] * 1024*1024) # to MB to bytes
+            bytes_served = (duration.total_seconds() + (duration.microseconds/1000000)) * (self.allocation['max_flow'] * 1024*1024) # to MB to bytes
             self.remaining -= bytes_served
             #print(self.adr(), "bytes_served:", bytes_served)
 
@@ -119,7 +131,7 @@ class Transfer(object):
 
 
         self.flows.append({
-            'max_flow': self.attr['allocation']['max_flow'], 
+            'max_flow': self.allocation['max_flow'], 
             'time': self.simulation.now()
             })
 
@@ -129,7 +141,7 @@ class Transfer(object):
         """
         Calculate when the next status change will happen for this request.
         """
-        seconds = self.remaining / (self.attr['allocation']['max_flow'] * 1024*1024)
+        seconds = self.remaining / (self.allocation['max_flow'] * 1024*1024)
         microseconds = seconds*1000000
         duration = datetime.timedelta(microseconds=microseconds)
 
@@ -148,22 +160,13 @@ class Transfer(object):
             'time': self.simulation.now()
             })
 
-        # mark file as cached
-        # TODO: read vs. write?
-        #if self.attr['type'] in ['w', 'write']:
-        #    self.simulation.fc.set(name=self.attr['file'], modified=self.simulation.now(), persistent=False)
-        #else:
-        #    self.simulation.fc.set(name=self.attr['file'], modified=self.simulation.now())
-
 
         # free any allocations
-        if self.status not in ['DROP'] and self.attr['allocation']['status']:
+        if self.status not in ['DROP'] and self.allocation['status']:
             # free network
-            res = self.attr['allocation']['res']
+            res = self.allocation['res']
             self.simulation.topology.free_capacity(res)
 
-            # free drives
-            self.attr['allocation']['drive'].free_capacity()
 
         # set finalize timestamp
         if time == None:
@@ -180,12 +183,6 @@ class Transfer(object):
 
         self.simulation.report.write_requests([self])
 
-    def dump_analysis(self):
-        """Make snapshot of the file system state."""
-        print("")
-        #self.simulation.log("")
-        
-
 
 
     def __str__(self):
@@ -195,28 +192,28 @@ class Transfer(object):
     def __repr__(self):
         adr = hex(id(self))
         info = ''
-        info += self.type[:3] + ' '
-        info += self.attr['file']
-        info += ' @ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
-        #info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
-        info += ' -> ' +    self.time_next_action.strftime("%H:%M:%S.%f")
+
+        if self.time_next_action != None:
+            info += ' -> ' +    self.time_next_action.strftime("%H:%M:%S.%f")
+        else:
+            info += ' -> ' + str(self.time_next_action)
+
+
         info += " BYTES REMAINING: " + "%s" % str(self.remaining)
-        #info += " ALLOC: " + str(self.attr['allocation'])
+        #info += " ALLOC: " + str(self.allocation)
         info += " STATUS: " + str(self.status)
         #info += str(self.attr)
 
-        rid = ''
+        tid = ''
         if self.id != None:
-            rid = self.id
+            tid = self.id
 
         #return '<%s %s %04d: %s>' % (adr, self.__class__.__name__, rid, info)
-        return '<%s %04d: %s>' % (self.__class__.__name__, rid, info)
+        return '<%s %04d: %s>' % (self.__class__.__name__, tid, info)
 
     def adr(self):
         adr = hex(id(self))
         info = ''
-        info += self.type + ' '
-        info += '@ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
         #return '<%s %s: %s>' % (adr, self.__class__.__name__, info)
         rid = ''
         if self.id != None:
