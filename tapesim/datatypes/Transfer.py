@@ -68,6 +68,7 @@ class Transfer(object):
 
     
     def renew_allocation(self):
+            # free drives
         """ Get or renew the current network allocation. """
 
         # find path source to target

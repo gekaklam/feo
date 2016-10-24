@@ -116,7 +116,8 @@ class Simulation(object):
         self.report = Report.Report(self)
 
         # Various tape related controller and management facilities
-        self.fc = Cache.Cache(self, size=math.pow(1024, 5)*5) # 5 PB shared disk cache
+        #self.fc = Cache.Cache(self, size=math.pow(1024, 5)*5) # 5 PB shared disk cache
+        self.fc = None
         self.fm = FileManager.FileManager(self)
         self.tm = TapeManager.TapeManager(self)
         self.rs = RobotScheduler.RobotScheduler(self) 
@@ -468,12 +469,26 @@ class Simulation(object):
 
 
             # WRITE guards
-            if request.attr['type'] in ['w', 'write']:
+            if request.attr['type'] in ['w', 'write'] and request.write_status == None:
                 # tmp: finish writes immedietly
                 #print("WRITE PROCESSED:", request.adr())
+
+                request.write_status = True
+                request.next_action = request.time_occur + datetime.timedelta(seconds=11)
+
+                # TODO add to tape I/O
+
+
+
+            if request.attr['type'] in ['w', 'write'] and request.write_status == True:
+                # tmp: finish writes immedietly
+                #print("WRITE PROCESSED:", request.adr())
+
                 request.remaining = 0  # TODO: only after allocation!!!!!
 
                 # TODO add to tape I/O
+
+
 
             # READ guards
             if request.attr['analysis']['file'] == False and request.attr['type'] in ['r', 'read']:

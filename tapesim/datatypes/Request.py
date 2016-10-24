@@ -46,6 +46,11 @@ class Request(object):
         self.tags = set()
         self.status_log = []
 
+        
+        self.write_status = None
+
+        self.process = None
+
 
         # All about time.
         self.time_occur = None        # When did the request occur/reach the I/O server?
@@ -90,13 +95,6 @@ class Request(object):
         pass
 
 
-
-    def write_lifecycle(self):
-        pass
-
-
-    def read_lifecycle(self):
-        pass
 
 
 

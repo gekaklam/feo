@@ -63,7 +63,7 @@ class Report(object):
     def prepare_report(self, name, fieldnames):
 
         if name in self.reports:
-            print("ERROR: Report can not be create as a report with that name alread exists.")
+            print("ERROR: Report can not be create as a report with that name alread exists:", name)
             exit(1)
 
         csv_filepath = "%s/%s.csv" % (self.filepath, name)
