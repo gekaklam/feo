@@ -246,10 +246,18 @@ class Simulation(object):
             print("Simulation halted. Nothing to do.")
             self.halted = True
 
+            if self.confirm_step:
+                self.topology.draw_graph('capacity', 'visualisation/waiting-for-user-confirmation.pdf')
+                user = input("Continue? [Enter]")
 
         elif self.iteration >= self.limit_iterations and self.limit_iterations not in ['inf', -1, None]:
             print("Simulation halted. Max iterations reached.")
             self.halted = True
+
+            if self.confirm_step:
+                self.topology.draw_graph('capacity', 'visualisation/waiting-for-user-confirmation.pdf')
+                user = input("Continue? [Enter]")
+
         else:
             self.iteration += 1
             # proceed to next step
@@ -263,6 +271,21 @@ class Simulation(object):
 
         pass
 
+    
+
+    def get_free_drives(self):
+
+        free_drives = []
+        for drive in self.drives:
+
+            # skip busy drives
+            if not drive.has_capacity():
+                continue
+            else:
+                free_drives.append(drive)
+
+        return free_drives
+
 
 
     def process_read_lifecycle(self, request):
@@ -274,14 +297,71 @@ class Simulation(object):
             self.log(" -> DISKIO")
             request.log_status("Enqueue for Disk I/O -> Client")
 
-        yield True
+            yield True
 
-        self.log("READ PHASE 2", request)
-        yield True
+        else:
+            self.log(request.adr() +  " is not cached");
+            self.log(" -> TAPE I/O -> I/O Server -> Cliean + Cache")
+            request.log_status("Enqueue for Tape I/O -> Cache/Client")
+            
+            # include 11 second tape receive panelty
+            request.time_next_action = self.simulation.now() + datetime.timedelta(seconds=11)
+            print("request next action:", request.time_next_action)
+            self.suggest_next_ts(request.time_next_action)
+            yield True
 
-        self.log("READ PHASE 3", request)
-        yield True
 
+         
+        # Try to get allocation
+        while request.attr['allocation']['status'] == None:
+
+            if request.is_cached:
+                pass
+
+            else:
+                self.log("READ: TRY ALLOCATION", request)
+            
+                free_drives = self.get_free_drives()
+                self.log(free_drives)
+
+                if len(free_drives) > 0:
+                    src = request.client
+                    tgt = free_drives[0]
+
+                    # find path source to target
+                    res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
+                    
+                    print(" 'Transfer':", src, "to", tgt)
+                    print("     '- Max-Flow:", max_flow)
+                    print("     '- Res:", res)
+
+                    best = {'max_flow': max_flow, 'res': res, 'drive': tgt, 'status': True}
+
+                    if max_flow >= 0:
+                        # reserve resources
+                        request.changed_allocation(best)
+                        tgt.allocate_capacity()
+                        self.topology.allocate_capacity(request.attr['allocation']['res'])
+
+                        # store allocation in request and calculate next timestep
+                        request.calc_next_action()
+                        print("request next action:", request.time_next_action)
+                        self.suggest_next_ts(request.time_next_action)
+                
+            yield True
+
+
+
+        while request.remaining > 0.0: 
+            print("find better allocation?")
+            request.serve()
+            request.calc_next_action()
+            print("request next action:", request.time_next_action)
+            self.suggest_next_ts(request.time_next_action)
+            yield True
+
+
+        
         self.log("FINALIZE:" + request.adr())
         request.finalize()
         yield False
@@ -436,8 +516,7 @@ class Simulation(object):
                 next(request.process)
                 processing_handled.append(request)
             except StopIteration:
-                print("iterator is empty!")
-
+                self.log("Process stopped:", request.adr())
 
             # if nothing else reattach
 

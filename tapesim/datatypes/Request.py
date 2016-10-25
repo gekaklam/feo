@@ -98,7 +98,6 @@ class Request(object):
 
 
 
-
     def wait_for(self, dependancy):
 
         pass
@@ -183,16 +182,20 @@ class Request(object):
 
         microseconds = 0
 
-
         if self.attr['allocation']['status'] != None:
+
+            print("remaining:", self.remaining, "@ rate of:", self.attr['allocation']['max_flow']*1024*1024)
+
             seconds = self.remaining / (self.attr['allocation']['max_flow'] * 1024*1024)
             microseconds = seconds*1000000
 
         duration = datetime.timedelta(microseconds=microseconds)
+        print("duration:", duration)
 
         self.time_next_action = self.simulation.now() + duration
-        self.time_next_action += datetime.timedelta(microseconds=1000000-self.time_next_action.microsecond)
-        #print("Next action:", self.time_next_action)
+        #self.time_next_action += datetime.timedelta(microseconds=1000000-self.time_next_action.microsecond)  # WHY!?
+
+        print("Next action:", self.time_next_action, self.adr())
 
 
     def finalize(self, time=None):
