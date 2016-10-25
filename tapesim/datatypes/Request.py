@@ -181,8 +181,13 @@ class Request(object):
         Calculate when the next status change will happen for this request.
         """
 
-        seconds = self.remaining / (self.attr['allocation']['max_flow'] * 1024*1024)
-        microseconds = seconds*1000000
+        microseconds = 0
+
+
+        if self.attr['allocation']['status'] != None:
+            seconds = self.remaining / (self.attr['allocation']['max_flow'] * 1024*1024)
+            microseconds = seconds*1000000
+
         duration = datetime.timedelta(microseconds=microseconds)
 
         self.time_next_action = self.simulation.now() + duration

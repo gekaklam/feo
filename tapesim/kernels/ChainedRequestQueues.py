@@ -267,13 +267,19 @@ class Simulation(object):
 
     def process_read_lifecycle(self, request):
 
-        print("read phase 1", request)
+        self.log("READ PHASE 1", request)
+        
+        if request.is_cached:
+            self.log(request.adr() +  " is cached");
+            self.log(" -> DISKIO")
+            request.log_status("Enqueue for Disk I/O -> Client")
+
         yield True
 
-        print("read phase 2", request)
+        self.log("READ PHASE 2", request)
         yield True
 
-        print("read phase 3", request)
+        self.log("READ PHASE 3", request)
         yield True
 
         self.log("FINALIZE:" + request.adr())
@@ -291,10 +297,6 @@ class Simulation(object):
         # Check Network
 
         #self.log(request.adr() + " is read");
-        #if request.is_cached:
-        #    self.log(request.adr() +  " is cached");
-        #    self.log(" -> DISKIO")
-        #    request.log_status("Enqueue for Disk I/O -> Client")
 
 
         #    t = Transfer.Transfer(self, request, src=self.fc, tgt=request.client, size=request.size)
@@ -343,13 +345,13 @@ class Simulation(object):
 
     def process_write_lifecycle(self, request):
 
-        print("write phase 1", request)
+        print("WRITE PHASE 1", request)
         yield True
 
-        print("write phase 2", request)
+        print("WRITE PHASE 2", request)
         yield True
 
-        print("write phase 3", request)
+        print("WRITE PHASE 3", request)
         yield True
 
         self.log("FINALIZE:" + request.adr())
