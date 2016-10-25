@@ -237,6 +237,9 @@ class Simulation(object):
         self.ts = self.next_ts
         self.next_ts = None
 
+        if self.ts == None:
+            self.ts = self.last_ts
+
         
         if len(self.INCOMING) <= 0 and len(self.processing) <= 0: 
             # TODO: Doesn't this halt the simulation to early?

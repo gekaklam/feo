@@ -108,7 +108,6 @@ class Report(object):
             duration = request.time_finished - request.time_occur
             
             
-            
             dic['occur'] = str(request.time_occur)
             dic['finish'] = str(request.time_finished)
 
