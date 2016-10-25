@@ -147,6 +147,8 @@ class Request(object):
 
 
     def serve(self, now=None, last=None):
+        """ Update the remaining bytes to be send. """
+
         if now == None:
             now = self.simulation.now()
 
@@ -287,7 +289,13 @@ class Request(object):
         info += self.attr['file']
         info += ' @ ' +         self.time_occur.strftime("%Y-%m-%d %H:%M:%S.%f")
         #info += ' next ' +    self.time_next_action.strftime("%Y-%m-%d %H:%M:%S.%f")
-        info += ' -> ' +    self.time_next_action.strftime("%H:%M:%S.%f")
+
+        if self.time_next_action != None:
+            info += ' -> ' +    self.time_next_action.strftime("%H:%M:%S.%f")
+        else:
+            info += ' -> ' + "ASAP"
+
+
         info += " BYTES REMAINING: " + "%s" % str(self.remaining)
         #info += " ALLOC: " + str(self.attr['allocation'])
         info += " STATUS: " + str(self.status)

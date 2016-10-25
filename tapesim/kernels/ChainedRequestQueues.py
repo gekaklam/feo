@@ -74,6 +74,7 @@ class Simulation(object):
 
     # Event management
     events = set()
+    processing = []
 
 
     # Queues
@@ -237,7 +238,7 @@ class Simulation(object):
         self.next_ts = None
 
         
-        if len(self.INCOMING) <= 0: 
+        if len(self.INCOMING) <= 0 and len(self.processing) <= 0: 
             # TODO: Doesn't this halt the simulation to early?
             print("Simulation halted. Nothing to do.")
             self.halted = True
@@ -264,17 +265,19 @@ class Simulation(object):
     def process_read_lifecycle(self, request):
 
         print("read phase 1", request)
-        yield 1
+        yield True
 
         print("read phase 2", request)
-        yield 2
+        yield True
 
         print("read phase 3", request)
-        yield 3
-
+        yield True
 
         self.log("FINALIZE:" + request.adr())
         request.finalize()
+        yield False
+
+
 
 
 
@@ -284,131 +287,127 @@ class Simulation(object):
         # Check Cache
         # Check Network
 
-        self.log(request.adr() + " is read");
-        if request.is_cached:
-            self.log(request.adr() +  " is cached");
-            self.log(" -> DISKIO")
-            request.log_status("Enqueue for Disk I/O -> Client")
+        #self.log(request.adr() + " is read");
+        #if request.is_cached:
+        #    self.log(request.adr() +  " is cached");
+        #    self.log(" -> DISKIO")
+        #    request.log_status("Enqueue for Disk I/O -> Client")
 
 
-            t = Transfer.Transfer(self, request, src=self.fc, tgt=request.client, size=request.size)
+        #    t = Transfer.Transfer(self, request, src=self.fc, tgt=request.client, size=request.size)
 
-            self.DISKIO.append(request) 
-        else:
-            self.log(request.adr() + " is not cached");
-            request.log_status("Enqueue for Tape I/O -> Disk I/O")
-
-
+        #    self.DISKIO.append(request) 
+        #else:
+        #    self.log(request.adr() + " is not cached");
+        #    request.log_status("Enqueue for Tape I/O -> Disk I/O")
 
 
 
-        # DISKIO 
-        #self.NETWORK.append(request) 
-
-        # Check Free Disk Space
-        # Check Network
-
-        # Allocations:
-        # IN:    Client --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        #                                         ->  Global Disk Cache (Network)
-
-        # TAPE:  Drive  --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        #                                         ->  Global Disk Cache (Network)
-        
-        # DIRTY: Cache  --Network-->  I/O Server  ->  Drive
-        
-        # All Disk I/O is currently limited only by the Network.
-        # The Disk I/O queue decides which requests may get scheduled first.
-
-        #self.NETWORK.append(request) 
-        print(request.attr)
-        size = request.attr['size']
-        name = request.attr['file']
-        self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=False)
-        request.log_status("Staged in Cache. (Read)")
-        pass
 
 
-        self.log(" -> DISKIO")
+        ## DISKIO 
+        ##self.NETWORK.append(request) 
+
+        ## Check Free Disk Space
+        ## Check Network
+
+        ## Allocations:
+        ## IN:    Client --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
+        ##                                         ->  Global Disk Cache (Network)
+
+        ## TAPE:  Drive  --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
+        ##                                         ->  Global Disk Cache (Network)
+        #
+        ## DIRTY: Cache  --Network-->  I/O Server  ->  Drive
+        #
+        ## All Disk I/O is currently limited only by the Network.
+        ## The Disk I/O queue decides which requests may get scheduled first.
+
+        ##self.NETWORK.append(request) 
+        #print(request.attr)
+        #size = request.attr['size']
+        #name = request.attr['file']
+        #self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=False)
+        #request.log_status("Staged in Cache. (Read)")
+        #pass
 
 
-        pass
+        #self.log(" -> DISKIO")
+
+
+        #pass
 
 
     def process_write_lifecycle(self, request):
 
         print("write phase 1", request)
-        yield 1
+        yield True
 
         print("write phase 2", request)
-        yield 2
+        yield True
 
         print("write phase 3", request)
-        yield 3
+        yield True
 
         self.log("FINALIZE:" + request.adr())
         request.finalize()
+        yield False
 
 
-        
+        ## INCOMING
+        ## Check Type
+        ## Check Cache
+        ## Check Network
 
-        # INCOMING
-        # Check Type
-        # Check Cache
-        # Check Network
+        #self.log(request.adr() + " is write");
+        ## TODO: set dirty?
+        #self.log(" -> DISKIO")
+        #self.DISKIO.append(request) 
+        #request.log_status("Enqueue for Client -> Disk I/O")
 
-        self.log(request.adr() + " is write");
-        # TODO: set dirty?
-        self.log(" -> DISKIO")
-        self.DISKIO.append(request) 
-        request.log_status("Enqueue for Client -> Disk I/O")
+        #t = Transfer.Transfer(self, request, src=request.client, tgt=self.fc, size=request.size)
+        #print(t)
+        #t.renew_allocation()
+        #print(t)
 
-        t = Transfer.Transfer(self, request, src=request.client, tgt=self.fc, size=request.size)
-        print(t)
-        t.renew_allocation()
-        print(t)
-
-        # exists? -> create
-        # displace cache
-        # transfer client to cache
-        
-
-        self.TAPEIO.append(request) 
-
+        ## exists? -> create
+        ## displace cache
+        ## transfer client to cache
 
         #self.TAPEIO.append(request) 
-        #self.DIRTY.append(request)    
-        #self.NETWORK.append(request) 
-        
-        #  
-        # DISKIO 
-        #self.NETWORK.append(request) 
 
-        # Check Free Disk Space
-        # Check Network
+        ##self.TAPEIO.append(request) 
+        ##self.DIRTY.append(request)    
+        ##self.NETWORK.append(request) 
+        #
+        ##  
+        ## DISKIO 
+        ##self.NETWORK.append(request) 
 
-        # Allocations:
-        # IN:    Client --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        #                                         ->  Global Disk Cache (Network)
+        ## Check Free Disk Space
+        ## Check Network
 
-        # TAPE:  Drive  --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        #                                         ->  Global Disk Cache (Network)
-        
-        # DIRTY: Cache  --Network-->  I/O Server  ->  Drive
-        
-        # All Disk I/O is currently limited only by the Network.
-        # The Disk I/O queue decides which requests may get scheduled first.
+        ## Allocations:
+        ## IN:    Client --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
+        ##                                         ->  Global Disk Cache (Network)
+
+        ## TAPE:  Drive  --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
+        ##                                         ->  Global Disk Cache (Network)
+        #
+        ## DIRTY: Cache  --Network-->  I/O Server  ->  Drive
+        #
+        ## All Disk I/O is currently limited only by the Network.
+        ## The Disk I/O queue decides which requests may get scheduled first.
+
+        #size = request.attr['size']
+        #name = request.attr['file']
+        #self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=True)
+
+        #request.log_status("Staged in Cache. (Dirty)")
+        #request.log_status("Completed for client.")
 
 
-        size = request.attr['size']
-        name = request.attr['file']
-        self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=True)
-
-        request.log_status("Staged in Cache. (Dirty)")
-        request.log_status("Completed for client.")
-
-
-        pass
+        #pass
 
 
 
@@ -417,12 +416,24 @@ class Simulation(object):
         
         self.log("Simulation.process()")
 
-
         # TODO: update active on this timestemp requests or do we have to update more? to reflect state
 
 
         # maybe collect one large list of happening events
         # and handle them depending on their next decision?
+        self.processing.sort(key=lambda x: x.time_next_action)
+        processing_handled = []
+        while len(self.processing):
+            request = self.processing.pop(0)
+
+            # proceed with request handling procedure
+            next(request.process)
+
+            # if nothing else reattach
+            processing_handled.append(request)
+
+        self.processing = processing_handled
+
 
 
         # TODO: Hooks for callbacks to be called
@@ -450,6 +461,9 @@ class Simulation(object):
 
                 elif request.type in READ:
                     request.process = self.process_read_lifecycle(request)
+
+                
+                self.processing.append(request)
 
 
 
@@ -481,7 +495,6 @@ class Simulation(object):
                 self.log("Timestamp: No events to process.")
                 # All elements incoming at this time have been handled (list is sorted!).
                 break;
-    
 
         #######################################################################
         pass
@@ -518,7 +531,9 @@ class Simulation(object):
             self.limit_iterations,
             self.ts.strftime("%Y-%m-%d %H:%M:%S.%f")
             ))
-        
+       
+        self.print_queue("processing")
+
         self.print_queue("INCOMING")
         self.print_queue("DISKIO")
         self.print_queue("TAPEIO")
