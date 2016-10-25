@@ -138,7 +138,7 @@ class ProviderXferlog(tapesim.components.Component.Component):
         # TODO: Too many hosts fix: Max-Flow will become to costly for many hosts. 
         # Quickfix: Map every host randomly to one of only 10 possible hosts.
         self.log("Hosts: %d" % len(self.hosts.keys()))
-        clienthost = "%s" % (random.randint(1,10))
+        #clienthost = "%s" % (random.randint(1,10))
 
         if clienthost not in self.hosts.keys():
             self.log("Client not present.")
