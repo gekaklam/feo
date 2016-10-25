@@ -427,10 +427,14 @@ class Simulation(object):
             request = self.processing.pop(0)
 
             # proceed with request handling procedure
-            next(request.process)
+            try:
+                next(request.process)
+                processing_handled.append(request)
+            except StopIteration:
+                print("iterator is empty!")
+
 
             # if nothing else reattach
-            processing_handled.append(request)
 
         self.processing = processing_handled
 
