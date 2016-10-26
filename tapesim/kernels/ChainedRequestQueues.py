@@ -306,6 +306,7 @@ class Simulation(object):
             self.log(" -> DISKIO")
             request.log_status("Enqueue for Disk I/O -> Client")
 
+            request.time_next_action = datetime.datetime(year=9999, month=12, day=31)
             # yield later, try allocation immedietly
 
         else:
@@ -357,7 +358,7 @@ class Simulation(object):
 
                 best = None
 
-                if max_flow >= 0:
+                if max_flow > 0:
                     # reserve resources
 
                     if request.is_cached:

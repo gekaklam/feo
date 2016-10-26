@@ -194,6 +194,12 @@ class Request(object):
         duration = datetime.timedelta(microseconds=microseconds)
         print("duration:", duration)
 
+
+        if duration <= datetime.timedelta(0):
+            self.remaining = 0
+
+
+
         self.time_next_action = self.simulation.now() + duration
         #self.time_next_action += datetime.timedelta(microseconds=1000000-self.time_next_action.microsecond)  # WHY!?
 
