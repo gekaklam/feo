@@ -20,6 +20,7 @@
 import datetime
 import tapesim.components.Component
 
+import pprint
 
 class Cache(tapesim.components.Component.Component):
     """
@@ -59,7 +60,7 @@ class Cache(tapesim.components.Component.Component):
         self.replacement_strategy = replacement_strategy
 
         # Cache State.
-        self.fieldnames = ['size', 'accessed', 'modified', 'dirty']
+        self.fieldnames = ['size', 'accessed', 'modified', 'dirty', 'name']
         self.files = {} # cache is empty on startup
 
         # Register CSV report.
@@ -76,9 +77,29 @@ class Cache(tapesim.components.Component.Component):
 
 
 
-    def replace(self, size, name=None):
+    def replace(self, size=None, name=None):
         """ Replace enough files to accomodate size. """
-       
+      
+        if size == None and name == None:
+            self.error("You have to specify at least one: Size or name to be replace.")
+
+
+        # least recently used
+        LRU = list(self.files)
+        pprint.pprint(LRU)
+        LRU.sort(key=lambda x: self.files[x]['modified'])
+        pprint.pprint(LRU)
+
+        while self.capacity < size:
+            filename = LRU.pop(0) 
+            print(filename)
+            self.free_capacity(self.files[filename]['size'])
+            self.files.pop(filename, None)
+
+        return
+
+
+        # TODO:
         if self.replacement_strategy.lower() in ['lru', 'least recently used', 'least-recently used']:
            pass 
 
@@ -152,6 +173,26 @@ class Cache(tapesim.components.Component.Component):
             return False
 
 
+    def allocate_capacity(self, size=1):
+        """docstring for block"""
+        print("ALLOC", self.__repr__())
+
+        if size >= self.max_capacity:
+            self.error("Tried to allocate larger than max capacity.", self.__repr__())
+        
+        # check if we need to replace any elements
+        if size > self.capacity:
+            # we have to free some space
+            self.replace(size - self.capacity)
+
+        if self.capacity >= size:
+            self.capacity -= size
+            return size
+        else:
+            self.error("Warning: Could not allocate!", self.__repr__())
+            return False
+
+
     def set(self, name, tape=None, size=None, modified=None, dirty=None):
         """ Add or update a cache entry. """
 
@@ -159,9 +200,12 @@ class Cache(tapesim.components.Component.Component):
 
         # create entry if not existent
         if not (name in self.files):
+            self.allocate_capacity(size=size)
             dic = dict.fromkeys(self.fieldnames)
             self.files[name] = dic
-            self.allocate_capacity(size=size)
+
+
+        self.files[name]['name'] = name
 
 
         if size != None:

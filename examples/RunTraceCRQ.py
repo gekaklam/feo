@@ -84,8 +84,8 @@ def main():
 
     parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../data/traces/dummy.xferlog")
 
-    parser.add_argument('--network-topoloy', default="../data/topologies/dummy-network.xml")
-    parser.add_argument('--library-topoloy', default="../data/topologies/dummy-library.xml")
+    parser.add_argument('--network-topology', default="../data/topologies/dummy-network.xml")
+    parser.add_argument('--library-topology', default="../data/topologies/dummy-library.xml")
 
 
     parser.add_argument('--limit', type=int, help='', default=None)
@@ -123,7 +123,7 @@ def main():
     print("==================================================================")
     # load a topology from xml
     #t = Topology.Topology(s, network_xml='configs/network.xml') 
-    t = Topology.Topology(sim, network_xml=args.network_topoloy) 
+    t = Topology.Topology(sim, network_xml=args.network_topology) 
     sim.topology = t 
 
     # Set provider limit (how many requests to process).

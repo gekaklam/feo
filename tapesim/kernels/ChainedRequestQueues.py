@@ -173,6 +173,14 @@ class Simulation(object):
 
     def suggest_next_ts(self, timestamp):
         """ Updates the timestamp thats used for the next step."""
+       
+        print(" !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!!")
+        print(" !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!!")
+        print(" !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!!")
+
+        print("suggest_next_ts: timestamp:", timestamp)
+        print("suggest_next_ts: next_ts:", self.next_ts)
+
         if self.next_ts == None or timestamp < self.next_ts:
             self.next_ts = timestamp
 
@@ -301,7 +309,7 @@ class Simulation(object):
 
         else:
             self.log(request.adr() +  " is not cached");
-            self.log(" -> TAPE I/O -> I/O Server -> Cliean + Cache")
+            self.log(" -> TAPE I/O -> Client + Cache")
             request.log_status("Enqueue for Tape I/O -> Cache/Client")
             
             # include 11 second tape receive panelty
