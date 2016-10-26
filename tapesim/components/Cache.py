@@ -49,8 +49,12 @@ class Cache(tapesim.components.Component.Component):
         super().__init__(simulation=simulation)
 
         # Cache configuration.
-        self.size = size
-        self.remain = size
+
+        capacity = size # TODO: change in constructur and components currently using it differently
+
+        self.capacity = capacity
+        self.max_capacity = capacity
+
         self.mode = None
         self.replacement_strategy = replacement_strategy
 
@@ -139,7 +143,7 @@ class Cache(tapesim.components.Component.Component):
         """
         
         # use lookups also to clean up
-        self.clean_cache()
+        #self.clean_cache()
 
 
         if name in self.files:
@@ -157,6 +161,7 @@ class Cache(tapesim.components.Component.Component):
         if not (name in self.files):
             dic = dict.fromkeys(self.fieldnames)
             self.files[name] = dic
+            self.allocate_capacity(size=size)
 
 
         if size != None:

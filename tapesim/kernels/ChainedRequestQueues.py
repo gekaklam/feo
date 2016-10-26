@@ -297,7 +297,7 @@ class Simulation(object):
             self.log(" -> DISKIO")
             request.log_status("Enqueue for Disk I/O -> Client")
 
-            yield True
+            # yield later, try allocation immedietly
 
         else:
             self.log(request.adr() +  " is not cached");
@@ -314,39 +314,58 @@ class Simulation(object):
          
         # Try to get allocation
         while request.attr['allocation']['status'] == None:
+            
+            src = None
+            tgt = None
+
 
             if request.is_cached:
+                self.log("READ: TRY ALLOCATION (cached)", request)
+                
+                src = self.fc
+                tgt = request.client
+                
                 pass
 
             else:
-                self.log("READ: TRY ALLOCATION", request)
+                self.log("READ: TRY ALLOCATION (uncached)", request)
             
                 free_drives = self.get_free_drives()
                 self.log(free_drives)
 
                 if len(free_drives) > 0:
-                    src = request.client
-                    tgt = free_drives[0]
+                    src = free_drives[0]
+                    tgt = request.client
 
-                    # find path source to target
-                    res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
+
+            if src != None and tgt != None:
+                # find path source to target
+                res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
+                
+                print(" 'Transfer':", src, "to", tgt)
+                print("     '- Max-Flow:", max_flow)
+                print("     '- Res:", res)
+
+                best = None
+
+                if max_flow >= 0:
+                    # reserve resources
+
+                    if request.is_cached:
+                        best = {'max_flow': max_flow, 'res': res, 'drive': None, 'status': True}
+                    else:
+                        # src is a drive and needs to be blocked
+                        best = {'max_flow': max_flow, 'res': res, 'drive': src, 'status': True}
+                        src.allocate_capacity()
+
                     
-                    print(" 'Transfer':", src, "to", tgt)
-                    print("     '- Max-Flow:", max_flow)
-                    print("     '- Res:", res)
+                    request.changed_allocation(best)
+                    self.topology.allocate_capacity(request.attr['allocation']['res'])
 
-                    best = {'max_flow': max_flow, 'res': res, 'drive': tgt, 'status': True}
-
-                    if max_flow >= 0:
-                        # reserve resources
-                        request.changed_allocation(best)
-                        tgt.allocate_capacity()
-                        self.topology.allocate_capacity(request.attr['allocation']['res'])
-
-                        # store allocation in request and calculate next timestep
-                        request.calc_next_action()
-                        print("request next action:", request.time_next_action)
-                        self.suggest_next_ts(request.time_next_action)
+                    # store allocation in request and calculate next timestep
+                    request.calc_next_action()
+                    print("request next action:", request.time_next_action)
+                    self.suggest_next_ts(request.time_next_action)
                 
             yield True
 
@@ -359,6 +378,11 @@ class Simulation(object):
             print("request next action:", request.time_next_action)
             self.suggest_next_ts(request.time_next_action)
             yield True
+
+        
+       
+        
+        self.fc.set(name=request.attr['file'], size=request.size, modified=self.simulation.now(), dirty=False)
 
 
         
@@ -642,10 +666,8 @@ class Simulation(object):
 
     def print_stats(self):
 
-        free_drives = []
-        for drive in self.drives:
-            if drive.has_capacity():
-                free_drives.append(drive)
+
+        free_drives = self.get_free_drives()
 
         print()
         self.log("Statistics:")
@@ -653,8 +675,9 @@ class Simulation(object):
 
         fc = self.fc
         factor = 1024*1024*1024 # kilo * mega * giga
+        factor = 1
         self.log("Cached:      %d/%d (%d, %d) (Files/Dirty)" % (
-            fc.remain/factor, fc.size/factor, len(fc.files), fc.count_dirty()))
+            fc.capacity/factor, fc.max_capacity/factor, len(fc.files), fc.count_dirty()))
 
         pass
 

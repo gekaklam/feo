@@ -223,7 +223,8 @@ class Request(object):
             self.simulation.topology.free_capacity(res)
 
             # free drives
-            self.attr['allocation']['drive'].free_capacity()
+            if self.attr['allocation']['drive'] != None:
+                self.attr['allocation']['drive'].free_capacity()
 
         # set finalize timestamp
         if time == None:

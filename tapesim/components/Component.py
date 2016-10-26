@@ -66,7 +66,7 @@ class Component(object):
         if (self.capacity + size) <= self.max_capacity:
             self.capacity += size
         else:
-            print("Error: trying to free capacity that was never there!")
+            self.error("Error: trying to free capacity that was never there!")
 
 
     def allocate_capacity(self, size=1):
@@ -77,7 +77,7 @@ class Component(object):
             self.capacity -= size
             return size
         else:
-            print("Warning: Could not allocate!", self.__repr__())
+            self.error("Warning: Could not allocate!", self.__repr__())
             return False
 
 
