@@ -695,9 +695,9 @@ class Simulation(object):
     # ID provision
     def get_rid(self):
         """ Request IDs """
-        new_tid = self.tids
-        self.tids += 1
-        return new_tid
+        new_rid = self.rids
+        self.rids += 1
+        return new_rid
 
     def get_tid(self):
         """ Tranfer IDs """

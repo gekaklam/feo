@@ -46,7 +46,8 @@ class Request(object):
         self.tags = set()
         self.status_log = []
 
-        
+        self.filename = attr['file']
+
         self.write_status = None
 
         self.process = None
@@ -88,7 +89,8 @@ class Request(object):
         self.flows = []
 
         # Make this request known to the simulation.
-        simulation.tids += 1
+        #simulation.tids += 1
+
         if simulation != None:
             simulation.submit(self)
 

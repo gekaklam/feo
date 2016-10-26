@@ -48,7 +48,9 @@ class Report(object):
             'wait_time_total',
             'throughput',
             'duration',
-            'status'
+            'status',
+            'rid',
+            'filename'
         ]
 
         self.prepare_report('requests', self.fieldnames)
@@ -116,6 +118,10 @@ class Report(object):
 
             dic['megabytes'] = request.attr['size']
             dic['status'] = request.status
+            
+
+            dic['rid'] = request.id
+            dic['filename'] = request.filename
 
             if duration.total_seconds() == 0.0:
                 dic['throughput'] = None
