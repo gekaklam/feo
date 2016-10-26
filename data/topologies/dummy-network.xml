@@ -82,6 +82,10 @@
 		<data key="weight">30.0</data>
 	</edge>
 
+	<edge id="e3" source="fc" target="mainswitch">
+		<data key="weight">15000.0</data>
+	</edge>
+
 
 	<!-- TAPE DRIVES -->
 	<!--
