@@ -235,6 +235,7 @@ class Simulation(object):
        
         # Find very next event from possible candidates.
         self.consider_request_ts(self.INCOMING)
+        self.consider_request_ts(self.processing)
         #self.consider_request_ts(self.OUTGOING)
         #self.consider_request_ts(self.disk_IO)
         #self.consider_request_ts(self.tape_IO)

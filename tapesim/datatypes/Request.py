@@ -39,7 +39,7 @@ class Request(object):
         self.size = None
         self.remaining = None
         self.is_cached = None
-        self.persistend = False
+        self.persistend = None
         self.action = None
 
         self.status = ''
@@ -287,6 +287,11 @@ class Request(object):
         # Attach analysis to request
         print("Analysis:", analysis)
         request.attr['analysis'] = analysis
+
+        if analysis['cache'] != None:
+            self.is_cached = True
+        else:
+            self.is_cached = False
 
 
     def __str__(self):
