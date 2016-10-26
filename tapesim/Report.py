@@ -50,7 +50,8 @@ class Report(object):
             'duration',
             'status',
             'rid',
-            'filename'
+            'filename',
+            'client'
         ]
 
         self.prepare_report('requests', self.fieldnames)
@@ -122,6 +123,7 @@ class Report(object):
 
             dic['rid'] = request.id
             dic['filename'] = request.filename
+            dic['client'] = str(request.client)
 
             if duration.total_seconds() == 0.0:
                 dic['throughput'] = None
