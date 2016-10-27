@@ -460,13 +460,59 @@ class Simulation(object):
     def process_write_lifecycle(self, request):
 
         print("WRITE PHASE 1", request)
-        yield True
 
-        print("WRITE PHASE 2", request)
-        yield True
+        # Try to get allocation
+        while request.attr['allocation']['status'] == None:
+            
+            src = None
+            tgt = None
 
-        print("WRITE PHASE 3", request)
-        yield True
+
+            src = request.client
+            tgt = self.fc
+
+
+            self.log("WRITE: TRY ALLOCATION (uncached)", request)
+        
+
+            if src != None and tgt != None:
+                # find path source to target
+                res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
+                
+                print(" 'Transfer':", src, "to", tgt)
+                print("     '- Max-Flow:", max_flow)
+                print("     '- Res:", res)
+
+                best = None
+
+                if max_flow > 0:
+                    # reserve resources
+
+                    best = {'max_flow': max_flow, 'res': res, 'drive': None, 'status': True}
+
+                    request.changed_allocation(best)
+                    self.topology.allocate_capacity(request.attr['allocation']['res'])
+
+                    # store allocation in request and calculate next timestep
+                    request.calc_next_action()
+                    print("request next action:", request.time_next_action)
+                    self.suggest_next_ts(request.time_next_action)
+                
+            yield True
+
+
+
+        while request.remaining > 0.0: 
+            print("find better allocation?")
+            request.serve()
+            request.calc_next_action()
+            print("request next action:", request.time_next_action)
+            self.suggest_next_ts(request.time_next_action)
+            yield True
+
+
+
+        self.fc.set(name=request.attr['file'], size=request.size, modified=self.simulation.now(), dirty=True)
 
         self.log("FINALIZE:" + request.adr())
         request.finalize()

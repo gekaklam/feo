@@ -55,7 +55,9 @@ class Request(object):
 
         # All about time.
         self.time_occur = None        # When did the request occur/reach the I/O server?
-        self.time_finished = None     # Time when the request is served as far as the client is concerned.
+        self.time_finished = None     # Time when the request is served as far as the client is concerned.  LEGACY
+        self.time_served = None       # As far as user/clients are concerend.
+        self.time_completed = None    # As far as the storage system is concerned. So this includes async activities.
         self.time_wait = None         # Accumulated wait time.
         self.time_next_action = None  # When does this request changes state the next time.
                                       #  May vary as transfer speed changes.
