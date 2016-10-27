@@ -306,7 +306,8 @@ class Simulation(object):
             self.log(" -> DISKIO")
             request.log_status("Enqueue for Disk I/O -> Client")
 
-            request.time_next_action = datetime.datetime(year=9999, month=12, day=31)
+            #request.time_next_action = datetime.datetime(year=9999, month=12, day=31)
+            request.time_next_action = self.simulation.now()
             # yield later, try allocation immedietly
 
         else:
@@ -320,6 +321,20 @@ class Simulation(object):
             self.suggest_next_ts(request.time_next_action)
             yield True
 
+       
+
+        self.log("########################")
+        self.log("########################", request)
+        self.log("########################")
+
+
+        print(request.time_next_action)
+        print(self.simulation.now())
+
+        while self.simulation.now() < request.time_next_action:
+            self.log(" not my turn yet", request)
+            yield True
+
 
          
         # Try to get allocation
@@ -328,6 +343,7 @@ class Simulation(object):
             src = None
             tgt = None
 
+            request.time_next_action = datetime.datetime(year=9999, month=12, day=31)
 
             if request.is_cached:
                 self.log("READ: TRY ALLOCATION (cached)", request)
@@ -464,15 +480,17 @@ class Simulation(object):
         # Try to get allocation
         while request.attr['allocation']['status'] == None:
             
+            self.log("WRITE: TRY ALLOCATION", request)
+
             src = None
             tgt = None
 
+            request.time_next_action = datetime.datetime(year=9999, month=12, day=31)
 
             src = request.client
             tgt = self.fc
 
 
-            self.log("WRITE: TRY ALLOCATION (uncached)", request)
         
 
             if src != None and tgt != None:
@@ -571,7 +589,6 @@ class Simulation(object):
         #request.log_status("Staged in Cache. (Dirty)")
         #request.log_status("Completed for client.")
 
-
         #pass
 
 
@@ -583,25 +600,42 @@ class Simulation(object):
 
         # TODO: update active on this timestemp requests or do we have to update more? to reflect state
 
+        print()
+        print()
+        print()
+
+
 
         # maybe collect one large list of happening events
         # and handle them depending on their next decision?
-        self.processing.sort(key=lambda x: x.time_next_action)
+        self.processing.sort(key=lambda x: x.time_occur)
         processing_handled = []
         while len(self.processing):
             request = self.processing.pop(0)
 
+            self.log(request)
+            self.log(request.attr['allocation'])
             # proceed with request handling procedure
             try:
-                next(request.process)
+                ret = next(request.process)
+
                 processing_handled.append(request)
+
             except StopIteration:
                 self.log("Process stopped:", request.adr())
 
-            # if nothing else reattach
+                # if nothing else reattach
+
+            print()
+            print()
+            print()
 
         self.processing = processing_handled
 
+
+        if self.ts == datetime.datetime(year=9999, month=12, day=31):
+            print("ERROR - End of time.")
+            exit(1)
 
 
         # TODO: Hooks for callbacks to be called

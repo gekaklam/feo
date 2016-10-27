@@ -38,7 +38,7 @@ class Request(object):
         self.type = None
         self.size = None
         self.remaining = None
-        self.is_cached = None
+        self.is_cached = False
         self.persistend = None
         self.action = None
 
@@ -88,6 +88,7 @@ class Request(object):
         self.type = attr['type']
 
         # Network allocations related to this request. Required to free allocations later.
+        # actually this sounds wrong? flows are not used for freeing
         self.flows = []
 
         # Make this request known to the simulation.
@@ -123,6 +124,13 @@ class Request(object):
         self.print_status_log()
 
 
+    # Debug auxiliary
+    ###########################################################################
+    def log(self, *args, level=0, tags=[], **kargs):                                                    
+        self.simulation.log("[%s]" % self.__class__.__name__, *args, **kargs)
+
+
+
 
     def changed_allocation(self, best):
         print(self.adr(), "changed allocation")
@@ -152,6 +160,8 @@ class Request(object):
     def serve(self, now=None, last=None):
         """ Update the remaining bytes to be send. """
 
+        self.log("SERVING")
+
         if now == None:
             now = self.simulation.now()
 
@@ -164,8 +174,12 @@ class Request(object):
         if duration.total_seconds() > 0.0:
             # TODO: variable serve rate
             bytes_served = (duration.total_seconds() + (duration.microseconds/1000000)) * (self.attr['allocation']['max_flow'] * 1024*1024) # to MB to bytes
+            print("remain:", self.remaining)
             self.remaining -= bytes_served
-            #print(self.adr(), "bytes_served:", bytes_served)
+            print(self.adr(), "bytes_served:", bytes_served)
+            print("remain:", self.remaining)
+        else:
+            print("SHORT duration!!!")
 
     
         if self.remaining < 1:
@@ -296,7 +310,7 @@ class Request(object):
         print("Analysis:", analysis)
         request.attr['analysis'] = analysis
 
-        if analysis['cache'] != None:
+        if analysis['cache'] != False:
             self.is_cached = True
         else:
             self.is_cached = False
