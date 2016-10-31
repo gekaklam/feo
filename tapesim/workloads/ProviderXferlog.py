@@ -40,7 +40,7 @@ class ProviderXferlog(tapesim.components.Component.Component):
 
 
 
-    def __init__(self, simulation, tracefile, limit=None):
+    def __init__(self, simulation, tracefile, limit=None, client_link_capacity=1000):
         
         self.simulation = simulation
 
@@ -54,6 +54,9 @@ class ProviderXferlog(tapesim.components.Component.Component):
         self.size_min = 0
         self.size_max = 0
         self.sizes = []
+
+
+        self.client_link_capacity = client_link_capacity
 
 
     def sanitize_type(self, typestring):
@@ -143,7 +146,7 @@ class ProviderXferlog(tapesim.components.Component.Component):
         if clienthost not in self.hosts.keys():
             self.log("Client not present.")
 
-            new_client = self.simulation.topology.register_network_component(name=clienthost, link_capacity=1000)
+            new_client = self.simulation.topology.register_network_component(name=clienthost, link_capacity=self.client_link_capacity)
             self.hosts[clienthost] = new_client
 
         # Create actual Request-object

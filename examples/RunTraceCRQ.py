@@ -150,7 +150,7 @@ def main():
     #pprint.pprint(sim.tm.tapes)
 
     # Open tracefile and register provider
-    trace = ProviderXferlog.ProviderXferlog(sim, args.tracefile, limit=limit)
+    trace = ProviderXferlog.ProviderXferlog(sim, args.tracefile, limit=limit, client_link_capacity=1)
     sim.provider.append(trace)
 
     
