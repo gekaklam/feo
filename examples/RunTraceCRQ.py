@@ -164,16 +164,16 @@ def main():
     drives = [
 			# IBM-LTO4:
 			{"type": "LTO-4", "mode": "rw", "position": (0,10,1,0)},
-			{"type": "LTO-4", "mode": "rw", "position": (0,10,1,3)},
-			{"type": "LTO-4", "mode": "rw", "position": (0,11,1,0)},
-			{"type": "LTO-4", "mode": "rw", "position": (0,11,1,3)},
+			#{"type": "LTO-4", "mode": "rw", "position": (0,10,1,3)},
+			#{"type": "LTO-4", "mode": "rw", "position": (0,11,1,0)},
+			#{"type": "LTO-4", "mode": "rw", "position": (0,11,1,3)},
 
-			{"type": "LTO-4", "mode": "w", "position": (2,2,1,0)},
-			{"type": "LTO-4", "mode": "w", "position": (2,2,1,3)},
-			{"type": "LTO-4", "mode": "w", "position": (2,2,1,15)},
+			#{"type": "LTO-4", "mode": "w", "position": (2,2,1,0)},
+			#{"type": "LTO-4", "mode": "w", "position": (2,2,1,3)},
+			#{"type": "LTO-4", "mode": "w", "position": (2,2,1,15)},
 
 			## IBM-LTO5:
-			#{"type": "LTO-5", "mode": "rw", "position": (0,5,1,1)},
+			{"type": "LTO-5", "mode": "rw", "position": (0,5,1,1)},
 			#{"type": "LTO-5", "mode": "rw", "position": (0,5,1,2)},
 			#{"type": "LTO-5", "mode": "rw", "position": (0,5,1,13)},
 			#{"type": "LTO-5", "mode": "rw", "position": (0,6,1,0)},
@@ -185,7 +185,7 @@ def main():
 			#{"type": "LTO-5", "mode": "rw", "position": (0,7,1,11)},
 
 			## IBM-LTO6:
-			#{"type": "LTO-6", "mode": "rw", "position": (1,1,1,4)},
+			{"type": "LTO-6", "mode": "rw", "position": (1,1,1,4)},
 			#{"type": "LTO-6", "mode": "rw", "position": (1,1,1,8)},
 			#{"type": "LTO-6", "mode": "rw", "position": (1,1,1,12)},
 			#{"type": "LTO-6", "mode": "rw", "position": (1,2,1,8)},
@@ -207,9 +207,10 @@ def main():
     for i,d  in enumerate(drives):
         #drivename = "%s Drive %d" % (d["type"], i)
         drivename = "%s" % (d["type"])
+        link_capacity = Drive.drive_specs[d['type']]['throughput'][0]
         new_drive = sim.topology.register_network_component(
                 name=drivename, 
-                link_capacity=100, 
+                link_capacity=link_capacity, 
                 drive=True
             )
 
