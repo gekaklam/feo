@@ -27,6 +27,7 @@ import pprint
 import datetime
 import time
 import locale
+import json
 locale.setlocale(locale.LC_ALL, 'en_US')
 
 
@@ -82,21 +83,27 @@ def main():
         )
 
 
+
+
     parser.add_argument('tracefile', nargs='?', type=argparse.FileType('r'), default="../data/traces/dummy.xferlog")
 
     parser.add_argument('--network-topology', default="../data/topologies/dummy-network.xml")
     parser.add_argument('--library-topology', default="../data/topologies/dummy-library.xml")
+    parser.add_argument('--drive-list', default="../data/other/drives.py-eval")
 
 
     parser.add_argument('--limit', type=int, help='', default=None)
     parser.add_argument('--limit-iterations', type=int, help='', default=-1)
 
-    parser.add_argument('--drives', type=int, help='')
     parser.add_argument('--config', type=int, help='')
     #parser.add_argument('--snapshot', help='')
 
 
     parser.add_argument("--confirm-step", help="Manually step through the simulation.", action="store_true")
+
+
+
+    parser.add_argument('--config-from-snapshot', help="Use the same configuration as path/to/snapshot.", default=None)
 
 
     args = parser.parse_args()
@@ -131,10 +138,7 @@ def main():
     if args.limit:
         limit = args.limit
 
-    # Set number of drives
-    drives = 60
-    if args.drives:
-        drives = args.drives
+
 
 
     # Rebuild tape filesystem: 
@@ -161,48 +165,11 @@ def main():
     print("==================================================================")
     
     # Install a number of tape drives.
-    drives = [
-			# IBM-LTO4:
-			{"type": "LTO-4", "mode": "rw", "position": (0,10,1,0)},
-			#{"type": "LTO-4", "mode": "rw", "position": (0,10,1,3)},
-			#{"type": "LTO-4", "mode": "rw", "position": (0,11,1,0)},
-			#{"type": "LTO-4", "mode": "rw", "position": (0,11,1,3)},
+    drives_file = open(args.drive_list, 'r')
+    drives_raw = drives_file.read()
+    drives = eval(drives_raw)
 
-			#{"type": "LTO-4", "mode": "w", "position": (2,2,1,0)},
-			#{"type": "LTO-4", "mode": "w", "position": (2,2,1,3)},
-			#{"type": "LTO-4", "mode": "w", "position": (2,2,1,15)},
-
-			## IBM-LTO5:
-			{"type": "LTO-5", "mode": "rw", "position": (0,5,1,1)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,5,1,2)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,5,1,13)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,6,1,0)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,6,1,4)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,6,1,8)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,6,1,12)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,7,1,6)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,7,1,7)},
-			#{"type": "LTO-5", "mode": "rw", "position": (0,7,1,11)},
-
-			## IBM-LTO6:
-			{"type": "LTO-6", "mode": "rw", "position": (1,1,1,4)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,1,1,8)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,1,1,12)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,2,1,8)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,2,1,12)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,3,1,4)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,3,1,8)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,3,1,12)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,5,1,4)},
-
-			#{"type": "LTO-6", "mode": "rw", "position": (1,6,1,4)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,6,1,8)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,7,1,4)},
-			#{"type": "LTO-6", "mode": "rw", "position": (1,7,1,8)},
-
-			#{"type": "LTO-6", "mode": "w", "position": (2,3,1,14)},
-			#{"type": "LTO-6", "mode": "w", "position": (2,3,1,15)},
-    ]
+    pprint.pprint(drives)
 
     for i,d  in enumerate(drives):
         #drivename = "%s Drive %d" % (d["type"], i)
@@ -217,6 +184,8 @@ def main():
 
     sim.topology.draw_graph('capacity', 'visualisation/after-installation.pdf')
 
+    print("PID:", os.getpid())
+    user = input("Continue? [Enter]")
 
     print()
     print("==================================================================")

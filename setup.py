@@ -16,9 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-# This file mostly metadata to describe this python package.
-
 import os
 try:
     from setuptools import setup, find_packages
@@ -35,6 +32,7 @@ config = {
     #'packages': ['tapesim'],
     'packages': find_packages(),
     'description': 'A tape library simulation',
+    #'long_description': '',
     'author': 'Jakob Luettgau',
     'url': 'https://github.com/jakobluettgau/feo',
     'download_url': '',
@@ -42,6 +40,10 @@ config = {
     'install_requires': ['nose'],
     'scripts': [],
     'zip_safe': False,
+
+
+    #test_suite='nose.collector',
+    #tests_require=['nose'],
 }
 
 setup(**config)
