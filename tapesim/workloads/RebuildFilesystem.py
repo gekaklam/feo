@@ -45,8 +45,8 @@ class RebuildFilesystem(tapesim.components.Component.Component):
 
 
     def sanitize_type(self, typestring):
-        READ = ['PSTO_Cmd', 'STOR_Cmd']
-        WRITE = ['PRTR_Cmd', 'RETR_Cmd']
+        WRITE = ['PSTO_Cmd', 'STOR_Cmd']
+        READ = ['PRTR_Cmd', 'RETR_Cmd']
 
         if typestring in READ:
             return 'read'

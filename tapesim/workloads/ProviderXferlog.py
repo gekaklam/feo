@@ -64,8 +64,8 @@ class ProviderXferlog(tapesim.components.Component.Component):
         Ensure xferlog types are mapped to READ and WRITE types known by the simulation.
         """
 
-        READ = ['PSTO_Cmd', 'STOR_Cmd']
-        WRITE = ['PRTR_Cmd', 'RETR_Cmd']
+        READ = ['PRTR_Cmd', 'RETR_Cmd']
+        WRITE = ['PSTO_Cmd', 'STOR_Cmd']
 
         if typestring in READ:
             return 'read'
