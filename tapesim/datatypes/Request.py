@@ -174,12 +174,13 @@ class Request(object):
         if duration.total_seconds() > 0.0:
             # TODO: variable serve rate
             bytes_served = (duration.total_seconds() + (duration.microseconds/1000000)) * (self.attr['allocation']['max_flow'] * 1024*1024) # to MB to bytes
-            print("remain:", self.remaining)
+            #print("remain:", self.remaining)
             self.remaining -= bytes_served
-            print(self.adr(), "bytes_served:", bytes_served)
-            print("remain:", self.remaining)
+            #print(self.adr(), "bytes_served:", bytes_served)
+            #print("remain:", self.remaining)
         else:
-            print("SHORT duration!!!")
+            #print("SHORT duration!!!")
+            pass
 
     
         if self.remaining < 1:
@@ -202,13 +203,13 @@ class Request(object):
 
         if self.attr['allocation']['status'] != None:
 
-            print("remaining:", self.remaining, "@ rate of:", self.attr['allocation']['max_flow']*1024*1024)
+            #print("remaining:", self.remaining, "@ rate of:", self.attr['allocation']['max_flow']*1024*1024)
 
             seconds = self.remaining / (self.attr['allocation']['max_flow'] * 1024*1024)
             microseconds = seconds*1000000
 
         duration = datetime.timedelta(microseconds=microseconds)
-        print("duration:", duration)
+        #print("duration:", duration)
 
 
         if duration <= datetime.timedelta(0):

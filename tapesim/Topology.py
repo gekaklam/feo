@@ -104,6 +104,18 @@ class Topology(tapesim.components.Component.Component):
             self.log(e, ":", prop[e])
 
 
+
+    def cap_edge_property(self, prop, cap):
+        g = self.graph
+        for e in g.edges():
+            if prop[e] > cap:
+                prop[e] = cap
+
+            
+
+
+
+
     def max_flow(self, src, tgt):
         g = self.graph
         pos = self.pos

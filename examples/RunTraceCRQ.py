@@ -28,6 +28,7 @@ import datetime
 import time
 import locale
 import json
+import random
 locale.setlocale(locale.LC_ALL, 'en_US')
 
 
@@ -62,16 +63,28 @@ import tapesim.components.TapeManager as TapeManager
 # TODO: indented for snapshot creation on abort.
 
 handling_signal = False
+sim = None
 
 def signal_handler(signal, frame):
     global handling_signal
+    global sim
+
     if handling_signal:
         os._exit(0)
 
-    handling_signal = True
-    print("\n What do you want to do?")
-    user = input("[Enter] to continue     OR      [Ctrl] + [C] to kill")
+    try:
+        handling_signal = True
+        sim.topology.draw_graph('capacity', 'visualisation/waiting-for-user-confirmaiton-via-signal.pdf')
+        print("\n What do you want to do?")
+        user = input("[Enter] to continue     OR      [Ctrl] + [C] to kill")
+    except:
+        # do nothing, just to cope with print not being safe in signal handlers
+        pass
+
+
+    # reset, just in case user interaction failed
     handling_signal = False
+
     return
 
 
@@ -87,6 +100,9 @@ def main():
     # maybe some environment variables?
     # print(os.environ['TAPESIM_'])
 
+    global sim
+
+    random.seed(42)
 
 
 
@@ -131,7 +147,7 @@ def main():
     print("==================================================================")
     print("== Initialize Simulation =========================================")
     print("==================================================================")
-    sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step, debug=True)
+    sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step, debug=False)
 
 
     ###########################################################################
@@ -174,14 +190,14 @@ def main():
     #pprint.pprint(sim.tm.tapes)
 
     # Open tracefile and register provider
-    trace = ProviderXferlog.ProviderXferlog(sim, args.tracefile, limit=limit, client_link_capacity=1000)
+    trace = ProviderXferlog.ProviderXferlog(sim, args.tracefile, limit=limit, client_link_capacity=15000)
     sim.provider.append(trace)
 
     
     
     print()
     print("==================================================================")
-    print("== Install Components ============================================")
+    print("== Install Drives ================================================")
     print("==================================================================")
     
     # Install a number of tape drives.

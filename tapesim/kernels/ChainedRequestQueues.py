@@ -151,6 +151,7 @@ class Simulation(object):
         # Counters
         # self.free_drives = 0
 
+        self.transfer_cap = 1000
 
 
 
@@ -186,13 +187,9 @@ class Simulation(object):
 
     def suggest_next_ts(self, timestamp):
         """ Updates the timestamp thats used for the next step."""
-       
-        print(" !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!!")
-        print(" !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!!")
-        print(" !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!! SUGGEST TS !!!")
 
-        print("suggest_next_ts: timestamp:", timestamp)
-        print("suggest_next_ts: next_ts:", self.next_ts)
+        #print("suggest_next_ts: timestamp:", timestamp)
+        #print("suggest_next_ts: next_ts:", self.next_ts)
 
         if self.next_ts == None or timestamp < self.next_ts:
             self.next_ts = timestamp
@@ -329,7 +326,7 @@ class Simulation(object):
             request.log_status("Enqueue for Tape I/O -> Cache/Client")
             
             # include 11 second tape receive panelty
-            request.time_next_action = self.simulation.now() + datetime.timedelta(seconds=11)
+            request.time_next_action = self.simulation.now() + datetime.timedelta(seconds=50)
             print("request next action:", request.time_next_action)
             self.suggest_next_ts(request.time_next_action)
             yield True
@@ -380,10 +377,15 @@ class Simulation(object):
             if src != None and tgt != None:
                 # find path source to target
                 res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
-                
+               
+                self.simulation.topology.cap_edge_property(res, self.transfer_cap)
+                if max_flow > self.transfer_cap:
+                    max_flow = self.transfer_cap
+
                 print(" 'Transfer':", src, "to", tgt)
                 print("     '- Max-Flow:", max_flow)
                 print("     '- Res:", res)
+
 
                 best = None
 
@@ -397,7 +399,10 @@ class Simulation(object):
                         best = {'max_flow': max_flow, 'res': res, 'drive': src, 'status': True}
                         src.allocate_capacity()
 
-                    
+        
+
+
+
                     request.changed_allocation(best)
                     self.topology.allocate_capacity(request.attr['allocation']['res'])
 
@@ -411,10 +416,10 @@ class Simulation(object):
 
 
         while request.remaining > 0.0: 
-            print("find better allocation?")
+            #print("find better allocation?")
             request.serve()
             request.calc_next_action()
-            print("request next action:", request.time_next_action)
+            #print("request next action:", request.time_next_action)
             self.suggest_next_ts(request.time_next_action)
             yield True
 
@@ -434,56 +439,6 @@ class Simulation(object):
 
 
 
-        # INCOMING
-        # Check Type
-        # Check Cache
-        # Check Network
-
-        #self.log(request.adr() + " is read");
-
-
-        #    t = Transfer.Transfer(self, request, src=self.fc, tgt=request.client, size=request.size)
-
-        #    self.DISKIO.append(request) 
-        #else:
-        #    self.log(request.adr() + " is not cached");
-        #    request.log_status("Enqueue for Tape I/O -> Disk I/O")
-
-
-
-
-
-        ## DISKIO 
-        ##self.NETWORK.append(request) 
-
-        ## Check Free Disk Space
-        ## Check Network
-
-        ## Allocations:
-        ## IN:    Client --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        ##                                         ->  Global Disk Cache (Network)
-
-        ## TAPE:  Drive  --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        ##                                         ->  Global Disk Cache (Network)
-        #
-        ## DIRTY: Cache  --Network-->  I/O Server  ->  Drive
-        #
-        ## All Disk I/O is currently limited only by the Network.
-        ## The Disk I/O queue decides which requests may get scheduled first.
-
-        ##self.NETWORK.append(request) 
-        #print(request.attr)
-        #size = request.attr['size']
-        #name = request.attr['file']
-        #self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=False)
-        #request.log_status("Staged in Cache. (Read)")
-        #pass
-
-
-        #self.log(" -> DISKIO")
-
-
-        #pass
 
 
     def process_write_lifecycle(self, request):
@@ -510,9 +465,14 @@ class Simulation(object):
                 # find path source to target
                 res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
                 
+                self.simulation.topology.cap_edge_property(res, self.transfer_cap)
+                if max_flow > self.transfer_cap:
+                    max_flow = self.transfer_cap
+
                 print(" 'Transfer':", src, "to", tgt)
                 print("     '- Max-Flow:", max_flow)
                 print("     '- Res:", res)
+
 
                 best = None
 
@@ -550,59 +510,7 @@ class Simulation(object):
         yield False
 
 
-        ## INCOMING
-        ## Check Type
-        ## Check Cache
-        ## Check Network
 
-        #self.log(request.adr() + " is write");
-        ## TODO: set dirty?
-        #self.log(" -> DISKIO")
-        #self.DISKIO.append(request) 
-        #request.log_status("Enqueue for Client -> Disk I/O")
-
-        #t = Transfer.Transfer(self, request, src=request.client, tgt=self.fc, size=request.size)
-        #print(t)
-        #t.renew_allocation()
-        #print(t)
-
-        ## exists? -> create
-        ## displace cache
-        ## transfer client to cache
-
-        #self.TAPEIO.append(request) 
-
-        ##self.TAPEIO.append(request) 
-        ##self.DIRTY.append(request)    
-        ##self.NETWORK.append(request) 
-        #
-        ##  
-        ## DISKIO 
-        ##self.NETWORK.append(request) 
-
-        ## Check Free Disk Space
-        ## Check Network
-
-        ## Allocations:
-        ## IN:    Client --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        ##                                         ->  Global Disk Cache (Network)
-
-        ## TAPE:  Drive  --Network-->  I/O Server  ->  RAM Cache  -> Local Disk Cache (free)
-        ##                                         ->  Global Disk Cache (Network)
-        #
-        ## DIRTY: Cache  --Network-->  I/O Server  ->  Drive
-        #
-        ## All Disk I/O is currently limited only by the Network.
-        ## The Disk I/O queue decides which requests may get scheduled first.
-
-        #size = request.attr['size']
-        #name = request.attr['file']
-        #self.fc.set(name=name, size=size, modified=self.simulation.now(), dirty=True)
-
-        #request.log_status("Staged in Cache. (Dirty)")
-        #request.log_status("Completed for client.")
-
-        #pass
 
 
 
@@ -613,9 +521,9 @@ class Simulation(object):
 
         # TODO: update active on this timestemp requests or do we have to update more? to reflect state
 
-        print()
-        print()
-        print()
+        self.log()
+        self.log()
+        self.log()
 
 
 
@@ -638,10 +546,9 @@ class Simulation(object):
                 self.log("Process stopped:", request.adr())
 
                 # if nothing else reattach
-
-            print()
-            print()
-            print()
+            self.log()
+            self.log()
+            self.log()
 
         self.processing = processing_handled
 
@@ -745,7 +652,7 @@ class Simulation(object):
             self.iteration,
             self.limit_iterations,
             self.ts.strftime("%Y-%m-%d %H:%M:%S.%f")
-            ))
+            ), force=True)
        
         self.print_queue("processing")
 

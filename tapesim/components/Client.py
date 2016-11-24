@@ -33,7 +33,7 @@ class Client(tapesim.components.Component.Component):
 
     throughput = None
 
-    def __init__(self, simulation, graph_tool_vertex=None, throughput=100, register_topology=False, name=None):
+    def __init__(self, simulation, graph_tool_vertex=None, throughput=1000, register_topology=False, name=None):
         super().__init__(simulation=simulation, name=name)
 
         #self.simulation = simulation
