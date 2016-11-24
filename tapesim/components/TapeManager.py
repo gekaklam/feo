@@ -148,7 +148,18 @@ class TapeManager(tapesim.components.Component.Component):
             self.log("NEW SLOT:")
             tries = 10
             slot_lim = 300
-            slotid = (random.randint(0, slot_lim), random.randint(0, slot_lim))
+            #slotid = (random.randint(0, slot_lim), random.randint(0, slot_lim))
+
+            #pos = (library, rail, column, inner/outer, slot)
+            #pos = (1, 1, -4, 1, 1)
+            slotid = (
+                random.randint(0, 5),     # library
+                random.randint(1, 4),     # rail
+                random.randint(-20, 20),  # column
+                random.randint(0, 1),     # inner/outer
+                random.randint(1, 13),    # slot
+                )
+
             while slotid in self.slots and tries > 0:
                 tries -= 1
                 self.log("SLOT TAKEN:", slotid)

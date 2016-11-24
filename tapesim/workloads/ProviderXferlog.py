@@ -40,7 +40,7 @@ class ProviderXferlog(tapesim.components.Component.Component):
 
 
 
-    def __init__(self, simulation, tracefile, limit=None, client_link_capacity=1000):
+    def __init__(self, simulation, tracefile, limit=None, client_link_capacity=15000, debug=None):
         
         self.simulation = simulation
 
@@ -57,6 +57,15 @@ class ProviderXferlog(tapesim.components.Component.Component):
 
 
         self.client_link_capacity = client_link_capacity
+
+
+        # Enable/disable debug on per component basis or inherit from simulation.
+        self.debug = None
+        if debug != None:
+            self.debug = debug
+        elif debug == None and self.simulation.debug == True:
+            self.debug = True
+
 
 
     def sanitize_type(self, typestring):

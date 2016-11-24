@@ -60,9 +60,22 @@ import tapesim.components.TapeManager as TapeManager
 
 
 # TODO: indented for snapshot creation on abort.
+
+handling_signal = False
+
 def signal_handler(signal, frame):
-    print("\nTODO: dump snapshot?")
-    sys.exit(0)
+    global handling_signal
+    if handling_signal:
+        os._exit(0)
+
+    handling_signal = True
+    print("\n What do you want to do?")
+    user = input("[Enter] to continue     OR      [Ctrl] + [C] to kill")
+    handling_signal = False
+    return
+
+
+
 
 # register interrupt handler
 signal.signal(signal.SIGINT, signal_handler)
@@ -118,7 +131,7 @@ def main():
     print("==================================================================")
     print("== Initialize Simulation =========================================")
     print("==================================================================")
-    sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step)
+    sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step, debug=True)
 
 
     ###########################################################################
@@ -139,17 +152,24 @@ def main():
         limit = args.limit
 
 
-
+    print()
+    print("==================================================================")
+    print("== Prepare File and Tape System ==================================")
+    print("==================================================================")
 
     # Rebuild tape filesystem: 
     print()
-    mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=None)
+    mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=None, debug=False)
+    # Disable debug for tape manager during rebuild filesystem to speed up.
+    sim.tm.debug = False
     mkfs.rebuild_filesystem()
+    sim.tm.debug = True
+
 
     print()
     print("Files:", len(sim.fm.files))
-    for f in sim.fm.files:
-        print(f, sim.fm.files[f])
+    #for f in sim.fm.files:
+    #    print(f, sim.fm.files[f])
     print("Tapes:", len(sim.tm.tapes))
     #pprint.pprint(sim.tm.tapes)
 

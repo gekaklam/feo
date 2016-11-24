@@ -24,8 +24,9 @@ class RebuildFilesystem(tapesim.components.Component.Component):
     """
 
 
-    def __init__(self, simulation, tracefile, limit=None):
+    def __init__(self, simulation, tracefile, limit=None, debug=None):
 
+        # Intentionally do not initialize with super! 
         self.simulation = simulation
 
         # Configuration
@@ -42,6 +43,13 @@ class RebuildFilesystem(tapesim.components.Component.Component):
         self.size_min = 0
         self.size_max = 0
         self.sizes = []
+
+        # Enable/disable debug on per component basis or inherit from simulation.
+        self.debug = None
+        if debug != None:
+            self.debug = debug
+        elif debug == None and self.simulation.debug == True:
+            self.debug = True
 
 
     def sanitize_type(self, typestring):
@@ -61,11 +69,19 @@ class RebuildFilesystem(tapesim.components.Component.Component):
     def rebuild_filesystem(self): 
         """Populate the tape and file system index."""
 
+        self.log("Rebuilding file system (this may take a while).", force=True)
+        # Take time for this operation.
+        start = time.clock()
+
         line = True
         while line:
             line = self.fetch_one()
             self.log(self.counter)
-            print()
+            self.log()
+
+        end = time.clock()
+        elapsed = end - start
+        self.log('Process time (rebuild filesystem):', elapsed, 'seconds', force=True)
 
         # Reset file position.
         self.tracefile.seek(0)
@@ -115,7 +131,7 @@ class RebuildFilesystem(tapesim.components.Component.Component):
         f = fm.lookup(attr['file'])
         if f:
             # File already exists. Print for debug purposes.
-            print(f)
+            self.log("File exists:", f)
 
         elif attr['type'] in ['read', 'r']:
             # File does not exists and this a read-like request.

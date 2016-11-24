@@ -37,16 +37,25 @@ class Component(object):
     """
 
 
-    def __init__(self, simulation=None, name=None):
+    def __init__(self, simulation=None, name=None, debug=None):
         self.simulation = simulation     # e.g. to receive model time
         self.active_requests = []
         self.is_aborting = False
         self.next_event = None
 
+        # Set nice name.
+        self.name = name
+
+        # Enable/disable debug on per component basis or inherit from simulation.
+        self.debug = None
+        if debug != None:
+            self.debug = debug
+        elif debug == None and self.simulation.debug == True:
+            self.debug = True
+    
+        # Register with simulation.
         if simulation != None:
             self.simulation.components.append(self)
-
-        self.name = name
 
         # Especially hardware components are relatively tightly coupled with
         # the topologies which is currently implemented using graphs.
@@ -121,7 +130,11 @@ class Component(object):
 
 
 
-    def log(self, *args, level=0, tags=[], **kargs):                                                    
+    def log(self, *args, level=0, tags=[], force=False, **kargs):                                                    
+        # exit early? debug off?
+        if self.debug == False and force == False:
+            return
+
         self.simulation.log("[%s]" % self.__class__.__name__, *args, **kargs)
 
 

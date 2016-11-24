@@ -97,11 +97,18 @@ class Simulation(object):
             confirm_step = False,
             keep_finished = False,
             limit_iterations = 100,
-            report = None
+            report = None,
+            debug = None
         ):
+
+        # Enable/disable debug messages
+        self.debug = False
+        if debug != None:
+            self.debug = debug
 
         # Convienience
         self.simulation = self
+
 
         # Simulation state
         self.halted = False
@@ -145,6 +152,8 @@ class Simulation(object):
         # self.free_drives = 0
 
 
+
+
         # Reports
         #########
         
@@ -162,6 +171,10 @@ class Simulation(object):
 
 
     def log(self, *args, level=0, tags=[], **kargs):                                                    
+        # exit early? debug off?
+        if self.debug == False:
+            return
+
         if self.ts is not None:
             print("[%s]" % self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), *args, **kargs)
         elif self.last_ts is not None:

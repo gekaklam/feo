@@ -94,6 +94,13 @@ class Complex(tapesim.components.Component.Component):
 
 
 
+class Robot(tapesim.components.Component.Component):
+    def __init__(self, simulation=None, library=None, rail=None):
+        
+        # robot hands can only have x position wihtin rail
+        self.pos = 0
+        
+
 
 
 class StorageTekSL8500(tapesim.components.Component.Component):
@@ -153,6 +160,10 @@ class StorageTekSL8500(tapesim.components.Component.Component):
             
         # Map of installed drives.
         self.drives = {}
+
+        self.robots = {}
+
+        self.robot_default_velocity = 1.0
 
 
         # calculate number of useable slots

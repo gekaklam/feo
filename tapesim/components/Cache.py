@@ -27,14 +27,18 @@ class Cache(tapesim.components.Component.Component):
     Caches in the model are more or less lookup tables that will forget entries
     after a certain time or when overflowing.
 
-
     Modes:
         Read-Through Caching
-        Write-Through Caching
-        Write-Behind Caching
         Refresh-Ahead Caching
 
         Read-Ahead
+
+
+        Write-Through Caching
+        Write-Behind Caching / Write-Back Caching
+
+
+
 
 
     Replacement Strategies:

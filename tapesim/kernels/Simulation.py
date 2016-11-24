@@ -74,13 +74,14 @@ class Simulation(object):
             confirm_step = False,
             keep_finished = False,
             max_iterations = 100,
-            report = None
+            report = None,
+            debug = None
         ):
        
         print("Initialising Simulation...")
 
-        # for simplicity also have simulation member
-        # allows to copy snippets from other parts more easily
+        # For simplicity also have simulation member:
+        # E.g., this allows to copy snippets from other parts more easily.
         self.simulation = self
 
         # Simulation State
@@ -114,6 +115,12 @@ class Simulation(object):
         # Analysis and reporting helpers
         self.persistency = PersistencyManager.PersistencyManager() 
         self.report = Report.Report(self)
+
+        # Enable/disable debug messages
+        self.debug = False
+        if debug != None:
+            self.debug = debug
+
 
         # Various tape related controller and management facilities
         #self.fc = Cache.Cache(self, size=math.pow(1024, 5)*5) # 5 PB shared disk cache
