@@ -4,6 +4,7 @@ library(scales)
 
 # SETTINGS
 outfile = "generated_plots/plot_mem"
+outfile = "plot_mem"
 df = read.csv("mem.log", sep="", header=TRUE)
 df$datetime <- as.POSIXct(strptime(df$datetime, "%H:%M:%S"))
 

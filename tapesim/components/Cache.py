@@ -68,8 +68,8 @@ class Cache(tapesim.components.Component.Component):
         self.files = {} # cache is empty on startup
 
         # Register CSV report.
-        self.report_name = 'cached_count'
-        self.report_fieldnames = ['datetime', 'count', 'dirty']
+        self.report_name = 'cache'
+        self.report_fieldnames = ['datetime', 'count', 'dirty', 'bytes_used', 'bytes_size', 'percent_util']
         self.simulation.report.prepare_report(self.report_name, self.report_fieldnames)
 
 
@@ -195,6 +195,8 @@ class Cache(tapesim.components.Component.Component):
         else:
             self.error("Warning: Could not allocate!", self.__repr__())
             return False
+
+
 
 
     def set(self, name, tape=None, size=None, modified=None, dirty=None):

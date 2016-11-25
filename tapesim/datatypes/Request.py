@@ -251,11 +251,7 @@ class Request(object):
             if self.attr['allocation']['drive'] != None:
                 self.attr['allocation']['drive'].free_capacity()
 
-        # set finalize timestamp
-        if time == None:
-            self.time_finished = self.simulation.now()
-        else:
-            self.time_finished = time
+
 
         # flush data
         if self.status not in ['DROP']:

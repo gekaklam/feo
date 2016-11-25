@@ -121,6 +121,8 @@ def main():
     parser.add_argument('--drive-list', default="../data/other/drives.py-eval")
 
 
+
+
     parser.add_argument('--limit', type=int, help='', default=None)
     parser.add_argument('--limit-iterations', type=int, help='', default=-1)
 
@@ -129,6 +131,9 @@ def main():
 
 
     parser.add_argument("--confirm-step", help="Manually step through the simulation.", action="store_true")
+    
+    
+    parser.add_argument("--debug", help="Be verbose.", action="store_true", default=False)
 
 
 
@@ -147,7 +152,7 @@ def main():
     print("==================================================================")
     print("== Initialize Simulation =========================================")
     print("==================================================================")
-    sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step, debug=False)
+    sim = Simulation.Simulation(limit_iterations=args.limit_iterations, confirm_step=args.confirm_step, debug=args.debug)
 
 
     ###########################################################################
@@ -175,7 +180,7 @@ def main():
 
     # Rebuild tape filesystem: 
     print()
-    mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=None, debug=False)
+    mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=None, debug=args.debug)
     # Disable debug for tape manager during rebuild filesystem to speed up.
     sim.tm.debug = False
     mkfs.rebuild_filesystem()

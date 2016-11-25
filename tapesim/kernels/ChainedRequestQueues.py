@@ -159,8 +159,8 @@ class Simulation(object):
         #########
         
         # Busy Drives ~= Stages | (perdiodic, thus local extrema may remain unoticed)
-        self.report_busy_drives = 'busy_drives'
-        self.report_busy_drives_fieldnames = ['datetime', 'count']
+        self.report_busy_drives = 'drives'
+        self.report_busy_drives_fieldnames = ['datetime', 'busy', 'enabled', 'total']
         self.report.prepare_report(self.report_busy_drives, self.report_busy_drives_fieldnames)
 
         # Request Wait-Times | (perdiodic, thus local extrema may remain unoticed)
@@ -171,9 +171,9 @@ class Simulation(object):
         pass
 
 
-    def log(self, *args, level=0, tags=[], **kargs):                                                    
+    def log(self, *args, level=0, tags=[], force=False, **kargs):                                                    
         # exit early? debug off?
-        if self.debug == False:
+        if self.debug == False and force == False:
             return
 
         if self.ts is not None:
@@ -408,7 +408,7 @@ class Simulation(object):
 
                     # store allocation in request and calculate next timestep
                     request.calc_next_action()
-                    print("request next action:", request.time_next_action)
+                    #print("request next action:", request.time_next_action)
                     self.suggest_next_ts(request.time_next_action)
                 
             yield True
@@ -428,6 +428,9 @@ class Simulation(object):
         
         self.fc.set(name=request.attr['file'], size=request.size, modified=self.simulation.now(), dirty=False)
 
+
+        # set finished
+        request.time_finished = self.simulation.now()
 
         
         self.log("FINALIZE:" + request.adr())
@@ -486,7 +489,7 @@ class Simulation(object):
 
                     # store allocation in request and calculate next timestep
                     request.calc_next_action()
-                    print("request next action:", request.time_next_action)
+                    #print("request next action:", request.time_next_action)
                     self.suggest_next_ts(request.time_next_action)
                 
             yield True
@@ -494,16 +497,28 @@ class Simulation(object):
 
 
         while request.remaining > 0.0: 
-            print("find better allocation?")
+            #print("find better allocation?")
             request.serve()
             request.calc_next_action()
-            print("request next action:", request.time_next_action)
+            #print("request next action:", request.time_next_action)
             self.suggest_next_ts(request.time_next_action)
             yield True
 
 
 
         self.fc.set(name=request.attr['file'], size=request.size, modified=self.simulation.now(), dirty=True)
+
+        # set finished
+        request.time_finished = self.simulation.now()
+
+
+
+        # TODO: continue processing to make persistent on tape too
+        
+
+        self.log("WRITE: TRY PHASE TWO: Copy to tape.", request, force=True)
+
+
 
         self.log("FINALIZE:" + request.adr())
         request.finalize()
@@ -676,20 +691,45 @@ class Simulation(object):
 
     def print_stats(self):
 
-
         free_drives = self.get_free_drives()
 
         print()
         self.log("Statistics:")
-        self.log("Free Drives: %d/%d" % (len(free_drives), len(self.drives)))
 
+        # Drives
+        self.log("Drives: %d/%d (Free/Total)" % (len(free_drives), len(self.drives)), force=True)
+
+        
+        # Cache
         fc = self.fc
         factor = 1024*1024*1024 # kilo * mega * giga
         factor = 1
-        self.log("Cached:      %d/%d (%d, %d) (Files/Dirty)" % (
-            fc.capacity/factor, fc.max_capacity/factor, len(fc.files), fc.count_dirty()))
+        
+        util = float(fc.capacity)/float(fc.max_capacity)
+        free = (fc.max_capacity-fc.capacity)
+        files = len(fc.files)
+        dirty = fc.count_dirty()
+
+        self.log("Cache:      %f %%  %d/%d (Remaining/Total) | (%d, %d) (Files/Dirty)" % (
+            util , free/factor, fc.max_capacity/factor, files, dirty), force=True)
 
         pass
+
+
+
+    def handle_performance_counters(self, mode=None):
+        """
+        For easy managment of performance counters, it is possible to register
+        callbacks that are triggered on a regular basis:
+
+            every x iterations
+            every x seconds
+
+        """
+
+
+        pass
+
 
 
 

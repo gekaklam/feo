@@ -1,21 +1,19 @@
+init:
+	    pip install -r requirements.txt
 
-all:
-	@echo Please specify a target.
-	@echo "Example: make test"
+test:
+	    nosetests
+
+.PHONY: init test
 
 
-deps:
-	pip3 install -r requirements.txt
+
 
 dist:
 	python3 setup.py sdist
 
-test:
-	py.test tests
-
 install:
 	python3 setup.py install
-
 
 
 clean:
