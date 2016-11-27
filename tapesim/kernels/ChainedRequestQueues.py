@@ -159,9 +159,9 @@ class Simulation(object):
         #########
         
         # Busy Drives ~= Stages | (perdiodic, thus local extrema may remain unoticed)
-        self.report_busy_drives = 'drives'
-        self.report_busy_drives_fieldnames = ['datetime', 'busy', 'enabled', 'total']
-        self.report.prepare_report(self.report_busy_drives, self.report_busy_drives_fieldnames)
+        self.report_drives = 'drives'
+        self.report_drives_fieldnames = ['datetime', 'free', 'enabled', 'total']
+        self.report.prepare_report(self.report_drives, self.report_drives_fieldnames)
 
         # Request Wait-Times | (perdiodic, thus local extrema may remain unoticed)
         self.report_wait_times = 'wait-times'
@@ -699,12 +699,22 @@ class Simulation(object):
         # Drives
         self.log("Drives: %d/%d (Free/Total)" % (len(free_drives), len(self.drives)), force=True)
 
+
+        dic = dict.fromkeys(self.report_drives_fieldnames)
+        dic['datetime'] = str(self.simulation.now())
+        dic['enabled'] = 0
+        dic['total'] = len(self.drives)
+        dic['free'] = len(free_drives)
+        print(dic)
+        self.simulation.report.add_report_row(self.report_drives, dic)
+
         
         # Cache
         fc = self.fc
         factor = 1024*1024*1024 # kilo * mega * giga
         factor = 1
-        
+
+
         util = float(fc.capacity)/float(fc.max_capacity)
         free = (fc.max_capacity-fc.capacity)
         files = len(fc.files)

@@ -59,6 +59,9 @@ class ProviderXferlog(tapesim.components.Component.Component):
         self.client_link_capacity = client_link_capacity
 
 
+        self.last_timestamp = None
+
+
         # Enable/disable debug on per component basis or inherit from simulation.
         self.debug = None
         if debug != None:
@@ -142,7 +145,17 @@ class ProviderXferlog(tapesim.components.Component.Component):
         raw_req = line.split(' ') 
         date_string = "%s %02d %s %s" % (raw_req[1], int(raw_req[2]), raw_req[3], raw_req[4])
         timestamp = datetime.datetime.strptime(date_string, DATE_FORMAT)
+
         attr = {'file': raw_req[6], 'type': self.sanitize_type(raw_req[7]), 'size': int(raw_req[8])}
+
+
+        # guard against unsorted xferlog
+        if self.last_timestamp != None and timestamp < self.last_timestamp:
+            print("vim %s:%d" % (self.tracefile.name, self.counter))
+            self.error("Date in trace not monoton increasing.", self.counter, raw_req) 
+        self.last_timestamp = timestamp
+
+
 
         # Maintain a list of known hosts, register unkown hosts to topology.
         clienthost = raw_req[5]

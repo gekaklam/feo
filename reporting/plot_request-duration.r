@@ -1,7 +1,9 @@
 library(ggplot2) 
 
-# read data
-df = read.csv("snapshot/requests.csv", header=TRUE)
+# SETTINGS
+outfile = "plot_snapshot-requests-duration"
+df = read.csv("requests.csv", header=TRUE)
+df$duration <- as.POSIXct(strptime(df$duration, "%H:%M:%S."))
 
 # create boxplot, start y from 0
 #p = ggplot(df, aes(factor(type), duration))
@@ -19,7 +21,7 @@ p = ggplot(df, aes(x=duration))
 p = p + geom_density() + expand_limits(y = 0)
 
 ## save plot as pdf
-ggsave(p, file="generated_plots/plot_request-duration-density.pdf", width=4, height=2, scale=1)
+ggsave(p, file=paste(outfile, "-density.pdf", sep=""), width=4, height=2, scale=1)
 
 
 ## HISTOGRAM

@@ -57,6 +57,7 @@ class Cache(tapesim.components.Component.Component):
 
         capacity = size # TODO: change in constructur and components currently using it differently
 
+        # Capacity is used and means bytes for the cache.
         self.capacity = capacity
         self.max_capacity = capacity
 
@@ -69,7 +70,7 @@ class Cache(tapesim.components.Component.Component):
 
         # Register CSV report.
         self.report_name = 'cache'
-        self.report_fieldnames = ['datetime', 'count', 'dirty', 'bytes_used', 'bytes_size', 'percent_util']
+        self.report_fieldnames = ['datetime', 'files_total', 'files_dirty', 'bytes_used', 'bytes_total', 'percent_utilization']
         self.simulation.report.prepare_report(self.report_name, self.report_fieldnames)
 
 
@@ -231,17 +232,25 @@ class Cache(tapesim.components.Component.Component):
 
 
         # stages changes, so log that for late analyis
-        self.report_stages()
+        self.report_status()
 
 
-    def report_stages(self):
+    def report_status(self):
         """ Add the current stage count to the stages.csv with current model time. """
+
         dic = dict.fromkeys(self.report_fieldnames)
 
         dic['datetime'] = str(self.simulation.now())
-        dic['count'] = str(len(self.files))
+
+        dic['percent_utilization'] = float(self.capacity)/float(self.max_capacity)
+        dic['bytes_used'] = self.capacity
+        dic['bytes_total'] = self.max_capacity
+        dic['files_total'] = len(self.files)
+        dic['files_dirty'] = self.count_dirty()
 
         self.simulation.report.add_report_row(self.report_name, dic)
+
+        return dic
 
 
     def dump(self):

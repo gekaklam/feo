@@ -69,18 +69,25 @@ def signal_handler(signal, frame):
     global handling_signal
     global sim
 
+    try:
+        print("\n Print handling signal?", handling_signal)
+    except:
+        pass
+
     if handling_signal:
         os._exit(0)
 
+    handling_signal = True
+
     try:
-        handling_signal = True
         sim.topology.draw_graph('capacity', 'visualisation/waiting-for-user-confirmaiton-via-signal.pdf')
         print("\n What do you want to do?")
+        handling_signal = True
         user = input("[Enter] to continue     OR      [Ctrl] + [C] to kill")
+        handling_signal = True
     except:
         # do nothing, just to cope with print not being safe in signal handlers
         pass
-
 
     # reset, just in case user interaction failed
     handling_signal = False

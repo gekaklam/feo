@@ -114,8 +114,8 @@ class Report(object):
             dic['occur'] = str(request.time_occur)
             dic['finish'] = str(request.time_finished)
 
-            #dic['duration'] = duration.total_seconds()
-            dic['duration'] = str(duration)
+            dic['duration'] = duration.total_seconds()
+            #dic['duration'] = str(duration)
 
             dic['megabytes'] = request.attr['size']
             dic['status'] = request.status
