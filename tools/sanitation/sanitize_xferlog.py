@@ -73,9 +73,7 @@ class XferlogSanitizer(object):
         if typestring in READ:
             return 'read'
         elif typestring in WRITE:
-            # TODO: REVERT!
-            #return 'write'
-            return 'read'
+            return 'write'
         else:
             return 'unknown:%s' % typestring
 
@@ -218,6 +216,13 @@ class XferlogSanitizer(object):
         # Type
         type = None
         type = raw_req[7]
+        typestring = self.sanitize_type(type)
+        if typestring in ['read']:
+            self.reads += 1
+        elif typestring in ['write']:
+            self.writes += 1
+        else:
+            self.other += 1
 
 
 

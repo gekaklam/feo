@@ -3,16 +3,15 @@ tmp/*
 
 tools/lib/*
 
-
 examples/snapshots/*
 examples/visualisation/*
 examples/visualization/*
 
+sandbox/*
+data-private/*
+
+
 
 *.pyc
 
-
-
-*.swp
-*.swo
-*.swn
+*.sw[klmnop]

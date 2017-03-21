@@ -6,8 +6,6 @@
 Components
 ===========
 
-holy moly
-coly foly
 
 
 Contents:

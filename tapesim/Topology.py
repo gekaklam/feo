@@ -71,11 +71,11 @@ class Topology(tapesim.components.Component.Component):
 
     # Debug auxiliary
     ###########################################################################
-    def log(self, *args, level=0, tags=[], **kargs):                                                    
+    def log(self, *args, level=0, tags=[], **kargs):
         self.simulation.log("[%s]" % self.__class__.__name__, *args, **kargs)
 
 
-    def error(self, *args, level=0, tags=[], **kargs):                                                    
+    def error(self, *args, level=0, tags=[], **kargs):
         # Print a stack trace.
         for line in traceback.format_stack():
             print(line.strip())
@@ -85,7 +85,7 @@ class Topology(tapesim.components.Component.Component):
         exit(1)
 
 
-    # 
+    #
     ###########################################################################
     def get_path(self, src, tgt):
         g = self.graph
@@ -111,7 +111,7 @@ class Topology(tapesim.components.Component.Component):
             if prop[e] > cap:
                 prop[e] = cap
 
-            
+
 
 
 
@@ -160,13 +160,13 @@ class Topology(tapesim.components.Component.Component):
         # Register a new vertex and add properties
         v = g.add_vertex()
         g.vp['name'][v] = name
-        
+
         # Create a simulation component object depending on the type (drive, client)
         if drive:
             new_comp = Drive.Drive(s)
         else:
             new_comp = Client.Client(s)
-       
+
 
         # Associate topology vertices and simulation components with each other.
         g.vp['obj'][v] = new_comp
@@ -233,7 +233,7 @@ class Topology(tapesim.components.Component.Component):
         for v in g.vertices():
             self.log(v, g.vp.name[v], g.vp['eval'][v], g.vp['_graphml_vertex_id'][v])
             classname = g.vp.name[v].split(":")[0]
-          
+
             # find client/node switch
             sc = g.vp.name[v].split(":")
             # ~> look for a named switch with name: NodeSwitch
@@ -274,7 +274,7 @@ class Topology(tapesim.components.Component.Component):
         name = g.vp["name"]
         weight = g.ep["weight"]
 
-        # Prepare label text property 
+        # Prepare label text property
         #edge_label = g.new_edge_property("string")
         #gt.map_property_values(weight, edge_label, lambda x: str(x))
 
@@ -304,7 +304,7 @@ class Topology(tapesim.components.Component.Component):
         for v in g.vertices():
             self.log(v, "obj:", g.vp['obj'][v], " <-> ")
             self.log(v, "name:", g.vp['name'][v])
-     
+
 
     def draw_graph(self, e_label, output, v_label='idx'):
         """
@@ -371,7 +371,7 @@ class Topology(tapesim.components.Component.Component):
 
             output_size=(800, 600),
 
-            vertex_text=vertex_label, 
+            vertex_text=vertex_label,
             vertex_shape = 'circle',
             #vertex_shape = 'square',
             #vertex_aspect = 2.0,
@@ -394,6 +394,3 @@ class Topology(tapesim.components.Component.Component):
 
 
             output=output)
-
-
-

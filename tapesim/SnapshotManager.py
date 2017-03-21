@@ -22,7 +22,7 @@ import sys
 import datetime
 import hashlib
 
-class PersistencyManager(object):
+class SnapshotManager(object):
 
     def __init__(self, path='./snapshots'):
         self.token_time = datetime.datetime.now()
@@ -46,8 +46,3 @@ class PersistencyManager(object):
             os.makedirs(self.path + "/requests")
             os.makedirs(self.path + "/reports")
             os.makedirs(self.path + "/library_state/")
-
-
-     
-        
-        

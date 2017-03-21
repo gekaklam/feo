@@ -1,6 +1,54 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""StorageTek SL8500: Robot Tape Library.
+
+../../doc/source/StorageTekSL8500.rst
+
+
+StorageTek SL85000 Modular Library System is exabyte storage system with
+support for multiple generations of tape media.
+
+LTO Compatabile
+up to 8 partitions in a single library, or 16 in a library complexes
+
+
+capacity module!?  e slots.. (that is not accounting for slots exclusive to system)
+
+14 slots high x ??
+demo shows: 13 slots high
+
+
+Customer View:
+--------------
+The library modules feature a number of components and allow for different
+customizations. The four core modules of a SL8500 are the following:
+
+    * Customer Interface Module (CIM) (front)
+        * Elevators (2 per CIM) (can move up to four cartridges)
+    * Storage Expansion Module (SEM) (up to five SEMs)
+    * Robotics Interface Module (RIM)
+        * Pass-thru Ports (PTP) (allows to move up to 2 cartridges at a time)
+    * Drive and Electronics Module (DEM)
+
+Operation View:
+---------------
+Multiple libraries modules can form complexes.
+    A library modules has 4 levels/rails.
+        Robots: Each rail hosts up to two robots.
+                A robot may serve left and right.
+
+        Drives: A single rail can host up to 16 tape drives.
+
+        Tapes:  Number of SEMs determines tapes in single rail.
+                Tape slots are on both sides of rail (inner/outer).
+
+[SL8500 Support Manual KB96154, Page 8] declares that up to two robots can
+serve a single rail within a library.
+
+"""
+
+
 # Copyright (C) 2015 Jakob Luettgau
 #
 # This program is free software: you can redistribute it and/or modify
@@ -29,7 +77,7 @@ import tapesim.components.Drive as Drive
 
 
 def travel_time_easing(distance, max_velocity, accelleration, decceleration=None):
-    """ 
+    """
         distance        m
         max_velocity    m/s
         accelleration   m/s/s
@@ -96,46 +144,15 @@ class Complex(tapesim.components.Component.Component):
 
 class Robot(tapesim.components.Component.Component):
     def __init__(self, simulation=None, library=None, rail=None):
-        
+
         # robot hands can only have x position wihtin rail
         self.pos = 0
-        
+
 
 
 
 class StorageTekSL8500(tapesim.components.Component.Component):
-    """
-    StorageTek SL85000 Modular Library System is exabyte storage system with
-    support for multiple generations of tape media.
 
-    LTO Compatabile
-    up to 8 partitions in a single library, or 16 in a library complexes
-    
-
-    capacity module!?  , adds 1728 slots
-
-    64 drives
-
-    1450 customer usable slots.. (that is not accounting for slots exclusive to system)
-
-
-    14 slots high x ??
-    demo shows: 13 slots high
-
-    4 levels
-
-
-    The library modules feature a number of components and allow for different
-    customizations. The four core modules of a SL8500 are the following:
-
-        * Customer Interface Module (CIM) (front)
-            * Elevators (2 per CIM) (can move up to four cartridges)
-        * Storage Expansion Module (SEM) (up to five SEMs)
-        * Robotics Interface Module (RIM)
-            * Pass-thru Ports (PTP) (allows to move up to 2 cartridges at a time)
-        * Drive and Electronics Module (DEM)
-
-    """
 
     def __init__(self, simulation, num_sems=5):
         super().__init__(simulation=simulation)
@@ -144,7 +161,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
         self.drive_cols = 2
         self.drive_cols_total = self.drive_cols * 2
 
-      
+
         self.column_mask = ['D','D', 'PTP', 'SEM', 'SEM', 'SEM', 'SEM', 'SEM', 'ELEVATOR']
         self.slot_mask = [1,0,2,3,4,5,6,7,8,9,10,11,12,0,13]
 
@@ -157,7 +174,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
         # SL8500 systems are purchased
         self.num_sems   = num_sems
 
-            
+
         # Map of installed drives.
         self.drives = {}
 
@@ -167,7 +184,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
 
 
         # calculate number of useable slots
-        num_slots_outer = 13 * 4 * 2 * (3 + self.num_sems * 8 + 2 + 3) 
+        num_slots_outer = 13 * 4 * 2 * (3 + self.num_sems * 8 + 2 + 3)
         num_slots_inner = 13 * 4 * 2 * (3 + self.num_sems * 8 + 2)
         self.num_slots = num_slots_inner + num_slots_outer
 
@@ -176,7 +193,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
 
 
 
-    def install_drives(self, csv_filepath, register_to_network_topology=True):
+    def install_drives_from_csv(self, csv_filepath, register_to_network_topology=True):
         """ Initialize library unit with the drive configuration as provided.
 
         """
@@ -204,13 +221,13 @@ class StorageTekSL8500(tapesim.components.Component.Component):
 
 
         # regex to find drive bay
-        #bay_hpss = 
+        #bay_hpss =
 
         for row in reader:
             if row['pos_firmware'] == '' and row['pos_hpss'] == '':
                 continue
 
-       
+
             # complex, rail, column, ?, 'bay'
             #pos_firmware = re.findall(r'', row['pos_firmware'])
             pos_firmware = row['pos_firmware'].split(',')
@@ -261,7 +278,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
             print("cm_coordinates for slots")
 
             #pos = (library, rail, column, inner/outer, slot)
-       
+
 
             pos = library_component
 
@@ -286,7 +303,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
             if ypos > 11 and self.honor_dead_rows == True:
                 dead_rows += 1
 
-            print("dead_rows = %d" % dead_rows)
+            #print("dead_rows = %d" % dead_rows)
 
             ypos += dead_rows
 
@@ -304,7 +321,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
 
             #pos = (library, rail, column, inner/outer, slot)
             pos = library_component.library_pos
-            
+
             xpos = pos[2]
             ypos = pos[4]
 
@@ -319,7 +336,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
             xpos = math.fabs(pos[2])
             ypos = math.fabs(pos[4])
 
-            
+
             xsep = 4.0
             ysep = 4.0
 
@@ -340,7 +357,7 @@ class StorageTekSL8500(tapesim.components.Component.Component):
             print("cm_coordinates for pass-through-port")
 
             pass
-        
+
 
 
     def get_logical_coordinates(self, cm_coordinates):
@@ -351,7 +368,3 @@ class StorageTekSL8500(tapesim.components.Component.Component):
 
     def get_nearest_slot(self, free=True, fill_level=None):
         return []
-  
-
-
-

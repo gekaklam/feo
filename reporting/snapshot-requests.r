@@ -40,8 +40,8 @@ p = p + geom_histogram() + expand_limits(y = 0)
 ggsave(p, file=paste(path_to_output, "/", "size-histogram.pdf", sep=""), width=10, height=3, scale=1)
 
 # density
-p = ggplot(df, aes(x=megabytes, colour=type))
-p = p + geom_density() + expand_limits(y = 0)
+p = ggplot(df, aes(x=megabytes, fill=type))
+p = p + geom_density(alpha=0.5) + expand_limits(y = 0)
 ggsave(p, file=paste(path_to_output, "size-density.pdf", sep=""), width=10, height=3, scale=1)
 
 ###############################################################################
@@ -53,8 +53,8 @@ p = p + xlab("duration in seconds")
 ggsave(p, file=paste(path_to_output, "/", "duration-histogram.pdf", sep=""), width=10, height=3, scale=1)
 
 # density
-p = ggplot(df, aes(x=duration, colour=type))
-p = p + geom_density() + expand_limits(y = 0)
+p = ggplot(df, aes(x=duration, fill=type))
+p = p + geom_density(alpha=0.5) + expand_limits(y = 0)
 p = p + xlab("duration in seconds")
 ggsave(p, file=paste(path_to_output, "/", "duration-density.pdf", sep=""), width=10, height=3, scale=1)
 

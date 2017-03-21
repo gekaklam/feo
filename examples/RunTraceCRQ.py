@@ -29,7 +29,7 @@ import time
 import locale
 import json
 import random
-locale.setlocale(locale.LC_ALL, 'en_US')
+locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
 
 # add parent directy as python path to allow examples to work without installing
@@ -128,8 +128,6 @@ def main():
     parser.add_argument('--drive-list', default="../data/other/drives.py-eval")
 
 
-
-
     parser.add_argument('--limit', type=int, help='', default=None)
     parser.add_argument('--limit-iterations', type=int, help='', default=-1)
 
@@ -138,8 +136,8 @@ def main():
 
 
     parser.add_argument("--confirm-step", help="Manually step through the simulation.", action="store_true")
-    
-    
+
+
     parser.add_argument("--debug", help="Be verbose.", action="store_true", default=False)
 
 
@@ -154,7 +152,7 @@ def main():
     print("PID:", os.getpid())
     user = input("Continue? [Enter]")
 
-    
+
     print()
     print("==================================================================")
     print("== Initialize Simulation =========================================")
@@ -170,9 +168,9 @@ def main():
     print("== Prepare Topology ==============================================")
     print("==================================================================")
     # load a topology from xml
-    #t = Topology.Topology(s, network_xml='configs/network.xml') 
-    t = Topology.Topology(sim, network_xml=args.network_topology) 
-    sim.topology = t 
+    #t = Topology.Topology(s, network_xml='configs/network.xml')
+    t = Topology.Topology(sim, network_xml=args.network_topology)
+    sim.topology = t
 
     # Set provider limit (how many requests to process).
     limit = None
@@ -185,7 +183,7 @@ def main():
     print("== Prepare File and Tape System ==================================")
     print("==================================================================")
 
-    # Rebuild tape filesystem: 
+    # Rebuild tape filesystem:
     print()
     mkfs = RebuildFilesystem.RebuildFilesystem(sim, args.tracefile, limit=None, debug=args.debug)
     # Disable debug for tape manager during rebuild filesystem to speed up.
@@ -205,13 +203,13 @@ def main():
     trace = ProviderXferlog.ProviderXferlog(sim, args.tracefile, limit=limit, client_link_capacity=15000)
     sim.provider.append(trace)
 
-    
-    
+
+
     print()
     print("==================================================================")
     print("== Install Drives ================================================")
     print("==================================================================")
-    
+
     # Install a number of tape drives.
     drives_file = open(args.drive_list, 'r')
     drives_raw = drives_file.read()
@@ -224,8 +222,8 @@ def main():
         drivename = "%s" % (d["type"])
         link_capacity = Drive.drive_specs[d['type']]['throughput'][0]
         new_drive = sim.topology.register_network_component(
-                name=drivename, 
-                link_capacity=link_capacity, 
+                name=drivename,
+                link_capacity=link_capacity,
                 drive=True
             )
 
@@ -256,7 +254,7 @@ def main():
     # signal.pause()
 
 
-    # Dump hosts observed so far.   
+    # Dump hosts observed so far.
     trace.report()
 
 
@@ -293,4 +291,3 @@ if __name__ == '__main__':
     end = time.clock()
     elapsed = end - start
     print('Process time:', elapsed, 'seconds')
-

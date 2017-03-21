@@ -17,11 +17,12 @@ and visualising the results.
 Overview
 --------
 
-* Request data
+* Request data (e.g. when you care about QoS)
 	* requests.csv for request summaries (e.g. throughput, duration, size, status/errors)
-	* stages.csv 
-	* wait-times.csv 
 	* Detailed request histories including bandwidth changes (optional)
+* Other default statistics
+	* drives.csv 
+	* wait-times.csv 
 * Simulation process log when enabled (Default: stdout)
 * Simulation state in limited detail (dumped at the end of the simulation)
 	* Filesystem state
@@ -30,6 +31,7 @@ Overview
 * HSM/Tape System Configuration
 	* Network Topology as XML
 	* Library Topology (pickle/XML)
+
 
 
 

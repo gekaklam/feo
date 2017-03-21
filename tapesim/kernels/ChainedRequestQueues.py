@@ -29,7 +29,7 @@ import graph_tool.all as gt
 # simulation and reporting facilities
 import tapesim.Debug as debug
 import tapesim.Topology as Topology
-import tapesim.PersistencyManager as PersistencyManager
+import tapesim.SnapshotManager as SnapshotManager
 import tapesim.Report as Report
 
 # import datatypes required used in this simulation
@@ -82,7 +82,7 @@ class Simulation(object):
 
     INCOMING = []
     OUTGOING = []
-    
+
     DISKIO  = []
     DIRTY   = []
     TAPEIO  = []
@@ -129,11 +129,11 @@ class Simulation(object):
         self.provider = []
         self.provider_batch_limit = 10
 
-        self.rids = 0 # Requests IDs    
-        self.tids = 0 # Transfer IDs    
+        self.rids = 0 # Requests IDs
+        self.tids = 0 # Transfer IDs
 
         # Analysis and reporting helpers
-        self.persistency = PersistencyManager.PersistencyManager() 
+        self.persistency = SnapshotManager.SnapshotManager()
         self.report = Report.Report(self)
 
 
@@ -142,7 +142,7 @@ class Simulation(object):
         self.fc = None
         self.fm = FileManager.FileManager(self)
         self.tm = TapeManager.TapeManager(self)
-        self.rs = RobotScheduler.RobotScheduler(self) 
+        self.rs = RobotScheduler.RobotScheduler(self)
         self.io = IOScheduler.IOScheduler(self)
         self.diskio = IOScheduler.IOScheduler(self)
         self.tapeio = IOScheduler.IOScheduler(self)
@@ -157,7 +157,7 @@ class Simulation(object):
 
         # Reports
         #########
-        
+
         # Busy Drives ~= Stages | (perdiodic, thus local extrema may remain unoticed)
         self.report_drives = 'drives'
         self.report_drives_fieldnames = ['datetime', 'free', 'enabled', 'total']
@@ -171,7 +171,7 @@ class Simulation(object):
         pass
 
 
-    def log(self, *args, level=0, tags=[], force=False, **kargs):                                                    
+    def log(self, *args, level=0, tags=[], force=False, **kargs):
         # exit early? debug off?
         if self.debug == False and force == False:
             return
@@ -219,11 +219,11 @@ class Simulation(object):
         self.run()
         pass
 
-    
+
 
     def run(self):
         """
-        Step through the simulation. 
+        Step through the simulation.
         """
         print("Simulation.run()")
         while not self.halted:
@@ -235,14 +235,14 @@ class Simulation(object):
         print("--------------------------------------------------------------")
         self.log("Simulation.step()")
         self.print_status()
-       
+
 
         # Fetch new events from available providers.
         if len(self.INCOMING) < self.provider_batch_limit:
             for provider in self.provider:
                 provider.fetch_batch(self.provider_batch_limit-len(self.INCOMING))
 
-       
+
         # Find very next event from possible candidates.
         self.consider_request_ts(self.INCOMING)
         self.consider_request_ts(self.processing)
@@ -259,8 +259,8 @@ class Simulation(object):
         if self.ts == None:
             self.ts = self.last_ts
 
-        
-        if len(self.INCOMING) <= 0 and len(self.processing) <= 0: 
+
+        if len(self.INCOMING) <= 0 and len(self.processing) <= 0:
             # TODO: Doesn't this halt the simulation to early?
             print("Simulation halted. Nothing to do.")
             self.halted = True
@@ -290,10 +290,8 @@ class Simulation(object):
 
         pass
 
-    
-
     def get_free_drives(self):
-
+        """Get the number of free drives for the current library topology."""
         free_drives = []
         for drive in self.drives:
 
@@ -305,12 +303,11 @@ class Simulation(object):
 
         return free_drives
 
-
-
     def process_read_lifecycle(self, request):
+        """Lifecycle of a READ request."""
 
         self.log("READ PHASE 1", request)
-        
+
         if request.is_cached:
             self.log(request.adr() +  " is cached");
             self.log(" -> DISKIO")
@@ -324,14 +321,14 @@ class Simulation(object):
             self.log(request.adr() +  " is not cached");
             self.log(" -> TAPE I/O -> Client + Cache")
             request.log_status("Enqueue for Tape I/O -> Cache/Client")
-            
+
             # include 11 second tape receive panelty
             request.time_next_action = self.simulation.now() + datetime.timedelta(seconds=50)
             print("request next action:", request.time_next_action)
             self.suggest_next_ts(request.time_next_action)
             yield True
 
-       
+
 
         self.log("########################")
         self.log("########################", request)
@@ -346,10 +343,9 @@ class Simulation(object):
             yield True
 
 
-         
         # Try to get allocation
         while request.attr['allocation']['status'] == None:
-            
+
             src = None
             tgt = None
 
@@ -357,15 +353,15 @@ class Simulation(object):
 
             if request.is_cached:
                 self.log("READ: TRY ALLOCATION (cached)", request)
-                
+
                 src = self.fc
                 tgt = request.client
-                
+
                 pass
 
             else:
                 self.log("READ: TRY ALLOCATION (uncached)", request)
-            
+
                 free_drives = self.get_free_drives()
                 self.log(free_drives)
 
@@ -377,7 +373,7 @@ class Simulation(object):
             if src != None and tgt != None:
                 # find path source to target
                 res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
-               
+
                 self.simulation.topology.cap_edge_property(res, self.transfer_cap)
                 if max_flow > self.transfer_cap:
                     max_flow = self.transfer_cap
@@ -399,7 +395,7 @@ class Simulation(object):
                         best = {'max_flow': max_flow, 'res': res, 'drive': src, 'status': True}
                         src.allocate_capacity()
 
-        
+
 
 
 
@@ -410,12 +406,12 @@ class Simulation(object):
                     request.calc_next_action()
                     #print("request next action:", request.time_next_action)
                     self.suggest_next_ts(request.time_next_action)
-                
+
             yield True
 
 
 
-        while request.remaining > 0.0: 
+        while request.remaining > 0.0:
             #print("find better allocation?")
             request.serve()
             request.calc_next_action()
@@ -423,34 +419,23 @@ class Simulation(object):
             self.suggest_next_ts(request.time_next_action)
             yield True
 
-        
-       
-        
         self.fc.set(name=request.attr['file'], size=request.size, modified=self.simulation.now(), dirty=False)
-
 
         # set finished
         request.time_finished = self.simulation.now()
 
-        
         self.log("FINALIZE:" + request.adr())
         request.finalize()
         yield False
 
-
-
-
-
-
-
-
     def process_write_lifecycle(self, request):
+        """Lifecycle of a write request."""
 
         print("WRITE PHASE 1", request)
 
         # Try to get allocation
         while request.attr['allocation']['status'] == None:
-            
+
             self.log("WRITE: TRY ALLOCATION", request)
 
             src = None
@@ -461,13 +446,10 @@ class Simulation(object):
             src = request.client
             tgt = self.fc
 
-
-        
-
-            if src != None and tgt != None:
+            if src is not None and tgt is not None:
                 # find path source to target
                 res, max_flow = self.simulation.topology.max_flow(src.nodeidx, tgt.nodeidx)
-                
+
                 self.simulation.topology.cap_edge_property(res, self.transfer_cap)
                 if max_flow > self.transfer_cap:
                     max_flow = self.transfer_cap
@@ -475,7 +457,6 @@ class Simulation(object):
                 print(" 'Transfer':", src, "to", tgt)
                 print("     '- Max-Flow:", max_flow)
                 print("     '- Res:", res)
-
 
                 best = None
 
@@ -491,12 +472,10 @@ class Simulation(object):
                     request.calc_next_action()
                     #print("request next action:", request.time_next_action)
                     self.suggest_next_ts(request.time_next_action)
-                
+
             yield True
 
-
-
-        while request.remaining > 0.0: 
+        while request.remaining > 0.0:
             #print("find better allocation?")
             request.serve()
             request.calc_next_action()
@@ -504,20 +483,14 @@ class Simulation(object):
             self.suggest_next_ts(request.time_next_action)
             yield True
 
-
-
         self.fc.set(name=request.attr['file'], size=request.size, modified=self.simulation.now(), dirty=True)
 
         # set finished
         request.time_finished = self.simulation.now()
 
 
-
         # TODO: continue processing to make persistent on tape too
-        
-
         self.log("WRITE: TRY PHASE TWO: Copy to tape.", request, force=True)
-
 
 
         self.log("FINALIZE:" + request.adr())
@@ -531,7 +504,7 @@ class Simulation(object):
 
     def process(self):
         """Process requests and reallocate resources if possible."""
-        
+
         self.log("Simulation.process()")
 
         # TODO: update active on this timestemp requests or do we have to update more? to reflect state
@@ -590,7 +563,7 @@ class Simulation(object):
                 request.analyse()
 
                 # do nothing with the request :)
-                #self.waiting.append(request) 
+                #self.waiting.append(request)
 
 
                 if request.type in WRITE:
@@ -599,7 +572,7 @@ class Simulation(object):
                 elif request.type in READ:
                     request.process = self.process_read_lifecycle(request)
 
-                
+
                 self.processing.append(request)
 
 
@@ -613,21 +586,17 @@ class Simulation(object):
 
 
                 # Only start processing request when all required allocations are granted?
-               
-
-
-
-                #self.INCOMING.append(request) 
-                #self.DISKIO.append(request) 
-                #self.TAPEIO.append(request) 
-                #self.DIRTY.append(request) 
-                #self.NETWORK.append(request) 
-                #self.OUTGOING.append(request) 
+                #self.INCOMING.append(request)
+                #self.DISKIO.append(request)
+                #self.TAPEIO.append(request)
+                #self.DIRTY.append(request)
+                #self.NETWORK.append(request)
+                #self.OUTGOING.append(request)
 
 
 
 
-                
+
             else:
                 self.log("Timestamp: No events to process.")
                 # All elements incoming at this time have been handled (list is sorted!).
@@ -655,7 +624,7 @@ class Simulation(object):
         return self.ts
 
 
-    
+
 
     def print_status(self):
         """
@@ -668,7 +637,7 @@ class Simulation(object):
             self.limit_iterations,
             self.ts.strftime("%Y-%m-%d %H:%M:%S.%f")
             ), force=True)
-       
+
         self.print_queue("processing")
 
         self.print_queue("INCOMING")
@@ -679,7 +648,7 @@ class Simulation(object):
 
         self.log("\__________")
         self.log("")
-    
+
 
     def print_queue(self, name):
         queue = getattr(self, name)
@@ -708,7 +677,7 @@ class Simulation(object):
         print(dic)
         self.simulation.report.add_report_row(self.report_drives, dic)
 
-        
+
         # Cache
         fc = self.fc
         factor = 1024*1024*1024 # kilo * mega * giga
@@ -756,4 +725,3 @@ class Simulation(object):
         new_tid = self.tids
         self.tids += 1
         return new_tid
-

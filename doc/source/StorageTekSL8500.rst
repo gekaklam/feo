@@ -36,6 +36,25 @@ API
 
 Model Abstraction
 ^^^^^^^^^^^^^^^^^
+
+
+
+
+    The library modules feature a number of components and allow for different
+    customizations. The four core modules of a SL8500 are the following:
+
+        * Customer Interface Module (CIM) (front)
+            * Elevators (2 per CIM) (can move up to four cartridges)
+        * Storage Expansion Module (SEM) (up to five SEMs)
+        * Robotics Interface Module (RIM)
+            * Pass-thru Ports (PTP) (allows to move up to 2 cartridges at a time)
+        * Drive and Electronics Module (DEM)
+
+
+
+
+
+
 .. figure:: assets/figures/svg/2d-model.svg
     :alt: A diagram depicting the various queues used to handle requests.
 
@@ -45,10 +64,6 @@ Model Abstraction
 .. figure:: assets/figures/svg/SL8500.svg
 
     SL8500 degrees of freedom.
-
-
-
-
 
 
 

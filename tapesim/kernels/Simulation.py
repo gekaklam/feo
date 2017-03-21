@@ -28,7 +28,7 @@ import graph_tool.all as gt
 
 # simulation and reporting facilities
 import tapesim.Topology as Topology
-import tapesim.PersistencyManager as PersistencyManager
+import tapesim.SnapshotManager as SnapshotManager
 import tapesim.Report as Report
 
 # import datatypes required used in this simulation
@@ -64,7 +64,7 @@ class Simulation(object):
     clients = []    # clients
     servers = []    # I/O servers
     drives  = []    # drives
-    
+
 
 
     # options
@@ -77,7 +77,7 @@ class Simulation(object):
             report = None,
             debug = None
         ):
-       
+
         print("Initialising Simulation...")
 
         # For simplicity also have simulation member:
@@ -113,7 +113,7 @@ class Simulation(object):
         self.keep_finished = keep_finished
 
         # Analysis and reporting helpers
-        self.persistency = PersistencyManager.PersistencyManager() 
+        self.persistency = SnapshotManager.SnapshotManager()
         self.report = Report.Report(self)
 
         # Enable/disable debug messages
@@ -127,12 +127,12 @@ class Simulation(object):
         self.fc = None
         self.fm = FileManager.FileManager(self)
         self.tm = TapeManager.TapeManager(self)
-        self.rs = RobotScheduler.RobotScheduler(self) 
+        self.rs = RobotScheduler.RobotScheduler(self)
         self.io = IOScheduler.IOScheduler(self)
 
         # counter
-        self.rids = 0 # Requests IDs    
-        self.tids = 0 # Transfer IDs   
+        self.rids = 0 # Requests IDs
+        self.tids = 0 # Transfer IDs
 
         self.dump_flow_history = False
 
@@ -166,7 +166,7 @@ class Simulation(object):
         pass
 
 
-    def log(self, *args, level=0, tags=[], **kargs):                                                    
+    def log(self, *args, level=0, tags=[], **kargs):
         if self.ts is not None:
             print("[%s]" % self.ts.strftime("%Y-%m-%d %H:%M:%S.%f"), *args, **kargs)
         elif self.last_ts is not None:
@@ -232,7 +232,7 @@ class Simulation(object):
         print("Processing:", len(self.processing))
         pprint.pprint(self.processing)
 
-        print("Finished: ", len(self.finished)) 
+        print("Finished: ", len(self.finished))
         pprint.pprint(self.finished)
 
         total = 0
@@ -285,11 +285,11 @@ class Simulation(object):
         #self.consider_request_ts(self.waiting)
 
         # waiting should have no activity and can be ignored
-       
+
         # set new ts and reset next_ts to determine winner
         print("      last_ts:", self.last_ts)
         print("Found next_ts:", self.next_ts)
-            
+
         # fetch from providers
         batch_limit = 10
         if len(self.incoming) < batch_limit:
@@ -328,7 +328,7 @@ class Simulation(object):
         unfinished += len(self.waiting)
         unfinished += len(self.processing)
 
-        if unfinished <= 0: 
+        if unfinished <= 0:
             print("Simulation halted. Nothing to do.")
             self.halted = True
         elif self.iteration >= self.max_iterations and self.max_iterations not in ['inf', -1, None]:
@@ -359,7 +359,7 @@ class Simulation(object):
     def process_incoming(self):
         """docstring for process_incoming"""
 
-        
+
         #print("\n>>> Handle incoming. >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         self.incoming.sort(key=lambda x: x.time_next_action)
 
@@ -370,12 +370,12 @@ class Simulation(object):
             if self.incoming[0].time_next_action == self.ts:   # or maybe occur time?
                 request = self.incoming.pop(0)
                 self.analyse(request)
-                self.waiting.append(request) 
-                #self.finished.append(request) 
+                self.waiting.append(request)
+                #self.finished.append(request)
             else:
                 # all elements incoming at this time have been handled
                 break;
-   
+
 
 
     def process_waiting(self, waiting=[]):
@@ -408,7 +408,7 @@ class Simulation(object):
             request = self.waiting.pop(0)
 
             # TODO: tape drive scheduler here? network considerations?
-            # TODO: make drives busy 
+            # TODO: make drives busy
 
             #print(request.attr)
 
@@ -427,7 +427,7 @@ class Simulation(object):
                 # drive allocation, happens already
                 if request.attr['analysis']['tape']:
                     accum = request.attr['analysis']['tape']['rtime']
-                    accum += request.attr['analysis']['tape']['stime'] 
+                    accum += request.attr['analysis']['tape']['stime']
 
                     print("rec + spool:", self.now(), "///", accum)
 
@@ -453,7 +453,7 @@ class Simulation(object):
         # Handle incoming
         self.process_incoming()
 
-       
+
 
         #print("\nCache:", "fill:", self.fc.size, self.fc.files)
 
@@ -507,7 +507,7 @@ class Simulation(object):
                 # update remaining data to be processed
                 request.serve()
 
-            
+
             if request.remaining <= 0.0 or request.status in ['DROP']:
                 print("FINA:", request.adr())
                 request.finalize()
@@ -538,7 +538,7 @@ class Simulation(object):
 
                 print(request.adr(), "has tape")
 
-                if request.attr['allocation']['status'] == None: 
+                if request.attr['allocation']['status'] == None:
 
                     print(request.adr(), "allocation is none")
 
@@ -553,7 +553,7 @@ class Simulation(object):
                             continue
 
                         if analyse_limit < 0:
-                            break 
+                            break
 
                         analyse_limit -= 1
 
@@ -577,10 +577,10 @@ class Simulation(object):
                         #vlist, elist = self.topology.get_path(src, tgt)
                         #print("      ", [str(v) for v in vlist])
                         #print("      ", [str(e) for e in elist])
-    
+
                     #print("best-max-flow:", best_max_flow)
                     #print("best:", best)
-            
+
                     # proceed with best and manifest the option
                     if best_max_flow > 0:
                         best['status'] = False
@@ -607,7 +607,7 @@ class Simulation(object):
                     request.attr['allocation']['drive'].allocate_capacity()
                     self.topology.allocate_capacity(request.attr['allocation']['res'])
                     request.attr['allocation']['status'] = True
-                
+
                 # calculate next action under current allocation
                 if request.attr['allocation']['status'] == True:
                     request.calc_next_action()
@@ -623,13 +623,13 @@ class Simulation(object):
         # Finally handle waiting
         self.process_waiting(waiting)
 
-    
+
         #print("\n>>> I/O Queue >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         #print("I/O:")
         #pprint.pprint(self.ioqueue)
 
         #while len(self.ioqueue):
-        #    request = self.ioqueue.pop() 
+        #    request = self.ioqueue.pop()
         #    self.finished.append(request)
 
         #print("\n>>> Net Queue >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -637,7 +637,7 @@ class Simulation(object):
         #pprint.pprint(self.netqueue)
 
         #while len(self.netqueue):
-        #    request = self.netqueue.pop() 
+        #    request = self.netqueue.pop()
         #    self.finished.append(request)
 
 
@@ -645,7 +645,7 @@ class Simulation(object):
 
     def analyse(self, request):
         """Handle the incoming request."""
-        
+
         analysis = {'serveable': False, 'cache': None, 'file': None, 'tape': None}
 
         #print("Simulation.analyse(%s)" % repr(request))
@@ -688,7 +688,7 @@ class Simulation(object):
             analyse_limit = 4
             for drive in self.drives:
                 if analyse_limit < 0:
-                    break 
+                    break
 
                 analyse_limit -= 1
 
@@ -717,7 +717,7 @@ class Simulation(object):
 
     def report(self):
         """Prints a simple report for the finished requests."""
-       
+
         print("\n\n\n")
         print("Report:")
         for request in self.finished:
@@ -732,19 +732,19 @@ class Simulation(object):
 
         self.wait_filter += 1
 
-        # log only every 
+        # log only every
         if self.wait_filter % 200 != 0:
             return
 
 
 
         self.dic = dict.fromkeys(self.fieldnames)
-        self.dic['1m']   = 0 
-        self.dic['2m']   = 0 
-        self.dic['3m']   = 0 
-        self.dic['4m']   = 0 
-        self.dic['5m']   = 0 
-        self.dic['8m']   = 0 
+        self.dic['1m']   = 0
+        self.dic['2m']   = 0
+        self.dic['3m']   = 0
+        self.dic['4m']   = 0
+        self.dic['5m']   = 0
+        self.dic['8m']   = 0
         self.dic['10m']  = 0
         self.dic['15m']  = 0
         self.dic['20m']  = 0
@@ -753,7 +753,7 @@ class Simulation(object):
         self.dic['2h']   = 0
         self.dic['4h']   = 0
         self.dic['8h']   = 0
-        self.dic['more'] = 0 
+        self.dic['more'] = 0
 
         dic = self.dic
 
@@ -793,7 +793,7 @@ class Simulation(object):
         self.fm.dump()
         #self.tm.dump()
         #self.fc.dump()
-       
+
 
 
 

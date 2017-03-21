@@ -6,9 +6,9 @@
 Feo: Tape Library Simulator
 ===========================
 
-Feo, as a reference to iron oxide (here Fe2O3) which is commonly used in magnetic tape media, allows to simulate automated tape libraries systems integrated into the storage hierarchy of modern data centers.
+Feo, as a reference to iron oxide (here Fe2O3) which is commonly used in magnetic tape media, allows to simulate automated tape library systems integrated into the storage hierarchy of modern data centers.
 
-The system is modularized to relfect the various physical and software based components found in actual storage systems for two reasons: 1) to accurately resemble the paths data flows in actual systems 2) to allow to operate and manage actual enterprise tape systems once in a matured state.
+The system is modularized to reflect the various physical and software based components found in actual storage systems for two reasons: 1) to accurately resemble the paths data flows in actual systems 2) to resemble a software development process as it would be used for software that operates and manages actual enterprise tape systems.
 
 
 .. toctree::
