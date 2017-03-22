@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+
+<!-- vertex property keys -->
+<key id="name" for="node" attr.name="name" attr.type="string" />
+<key id="eval" for="node" attr.name="eval" attr.type="string" />
+
+<!-- edge property keys -->
+<key id="pos" for="node" attr.name="pos" attr.type="vector_float" />
+<key id="weight" for="edge" attr.name="weight" attr.type="double" />
+
+<key id="throughput" for="edge" attr.name="capacity" attr.type="double" />
+<key id="latency" for="edge" attr.name="latency" attr.type="double" />
+
+<graph id="G" edgedefault="directed">
+
+	<!-- graph properties -->
+
+	<!-- vertices ########################################################## -->
+
+
+
+	<!-- switch to easily add new nodes-->
+	<node id="mainswitch">
+		<data key="name">Switch:MainSwitch</data>
+	</node>
+
+	<node id="nodeswitch">
+		<data key="name">Switch:NodeSwitch</data>
+	</node>
+
+	<node id="driveswitch">
+		<data key="name">Switch:DriveSwitch</data>
+	</node>
+
+
+	<!-- a dummy client for debugging -->
+	<node id="c0">
+		<data key="name">Dummy</data>
+		<data key="eval">Client.Client(s)</data>
+	</node>
+
+	<!-- A global disk cache. -->
+	<node id="fc">
+		<data key="name">Cache:</data>
+		<data key="eval">Cache.Cache(s, size=math.pow(1024, 5)*5, replace_sim_fc=True)</data>
+	</node>
+
+	<!-- I/O Servers -->
+	<node id="io0">
+		<data key="name">I/O:A</data>
+		<data key="eval">IOServer.IOServer(s)</data>
+	</node>
+
+	<node id="io1">
+		<data key="name">I/O:B</data>
+		<data key="eval">IOServer.IOServer(s)</data>
+	</node>
+
+
+	<!-- edges ############################################################# -->
+	<edge id="ec0node" source="c0" target="nodeswitch">
+		<data key="weight">10.0</data>
+	</edge>
+
+
+	<edge id="e0" source="nodeswitch" target="mainswitch">
+		<data key="weight">15000.0</data>
+	</edge>
+
+	<edge id="e2" source="mainswitch" target="driveswitch">
+		<data key="weight">15000.0</data>
+	</edge>
+
+	<edge id="e3" source="io0" target="mainswitch">
+		<data key="weight">30.0</data>
+	</edge>
+
+	<edge id="e4" source="io1" target="mainswitch">
+		<data key="weight">30.0</data>
+	</edge>
+
+	<edge id="e3" source="fc" target="mainswitch">
+		<data key="weight">15000.0</data>
+	</edge>
+
+
+	<!-- TAPE DRIVES -->
+	<!--
+	<node id="drive0">
+		<data key="name">Drive:A</data>
+	</node>
+	<edge id="e6" source="drive0" target="driveswitch">
+		<data key="weight">100.0</data>
+	</edge>
+
+	<node id="drive1">
+		<data key="name">Drive:B</data>
+	</node>
+	<edge id="e7" source="drive1" target="driveswitch">
+		<data key="weight">100.0</data>
+	</edge>
+
+	<node id="drive2">
+		<data key="name">Drive:C</data>
+	</node>
+	<edge id="e6" source="drive2" target="driveswitch">
+		<data key="weight">100.0</data>
+	</edge>
+	-->
+
+
+
+
+
+
+
+</graph>
+</graphml>

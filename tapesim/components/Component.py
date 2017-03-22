@@ -21,7 +21,6 @@ import datetime
 import sys
 import traceback
 
-import graph_tool.all as gt
 
 
 class Component(object):
@@ -52,23 +51,19 @@ class Component(object):
             self.debug = debug
         elif debug == None and self.simulation.debug == True:
             self.debug = True
-    
+
         # Register with simulation.
         if simulation != None:
             self.simulation.components.append(self)
 
-        # Especially hardware components are relatively tightly coupled with
-        # the topologies which is currently implemented using graphs.
-        self.graph = None
-        self.nodeidx = None
 
-        # 
+        #
         self.capacity = 1
         self.max_capacity = 1
 
         pass
 
-   
+
     def free_capacity(self, size=1):
         print("FREE", self.__repr__())
 
@@ -104,7 +99,7 @@ class Component(object):
             return True
         else:
             return False
-    
+
 
     def abort(self):
         """Initiate abort of current task. The default behaviour checks if the
@@ -130,7 +125,7 @@ class Component(object):
 
 
 
-    def log(self, *args, level=0, tags=[], force=False, **kargs):                                                    
+    def log(self, *args, level=0, tags=[], force=False, **kargs):
         # exit early? debug off?
         if self.debug == False and force == False:
             return
@@ -138,7 +133,7 @@ class Component(object):
         self.simulation.log("[%s]" % self.__class__.__name__, *args, **kargs)
 
 
-    def error(self, *args, level=0, tags=[], **kargs):                                                    
+    def error(self, *args, level=0, tags=[], **kargs):
         # Print a stack trace.
         for line in traceback.format_stack():
             print(line.strip())
@@ -146,4 +141,3 @@ class Component(object):
         # Exit with error description.
         print("[%s] ERROR:" % self.__class__.__name__, *args, **kargs)
         exit(1)
-

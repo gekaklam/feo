@@ -28,9 +28,13 @@ import graph_tool.all as gt
 
 # simulation and reporting facilities
 import tapesim.Debug as debug
-import tapesim.Topology as Topology
+
+# Data Collection and Reporting
 import tapesim.SnapshotManager as SnapshotManager
 import tapesim.Report as Report
+
+# Topologies
+import tapesim.Topology as Topology
 
 # import datatypes required used in this simulation
 import tapesim.datatypes.Request as Request
@@ -56,7 +60,8 @@ import tapesim.scheduling.IOScheduler as DiskIOScheduler
 import tapesim.scheduling.IOScheduler as TapeIOScheduler
 
 
-READ = ['read', 'r', 'WRITE', 'W']
+
+READ = ['read', 'r', 'READ', 'R']
 WRITE = ['write', 'w', 'WRITE', 'W']
 
 

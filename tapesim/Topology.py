@@ -61,6 +61,7 @@ class Topology(tapesim.components.Component.Component):
         if network_xml:
             self.network_from_xml(network_xml)
 
+
         if tape_xml:
             self.tape_from_xml(tape_xml)
 
@@ -289,6 +290,8 @@ class Topology(tapesim.components.Component.Component):
 
     def tape_from_xml(self, path):
         """Load a tape topology from GraphML XML file."""
+
+        self.log("Skipped tape_from_xml:", path)
         pass
 
 
@@ -313,6 +316,7 @@ class Topology(tapesim.components.Component.Component):
 
         @param output   filepath of desired output file (pdf)
         """
+
 
         s = self.simulation
         g = self.graph
