@@ -12,7 +12,7 @@ if (length(args)==0) {
   args[2] = "./"
 }
 
-path_to_snapshot = "./2017-03-16T17:15:39.685334_43f835ce2f"
+path_to_snapshot = args[1]
 path_to_output = path_to_snapshot
 dir.create(file.path(path_to_output, "plots"), showWarnings = TRUE)
 path_to_output = paste(path_to_snapshot, "/plots/", sep="")

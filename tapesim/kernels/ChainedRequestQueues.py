@@ -169,6 +169,7 @@ class Simulation(object):
         self.report.prepare_report(self.report_drives, self.report_drives_fieldnames)
 
         # Request Wait-Times | (perdiodic, thus local extrema may remain unoticed)
+        self.report_wait_state = 0
         self.report_wait_times = 'wait-times'
         self.report_wait_times_fieldnames = ['datetime', '1m', '2m', '3m', '4m', '5m', '8m', '10m', '15m', '20m', '30m', '1h', '2h', '4h', '8h', 'more', 'count']
         self.report.prepare_report(self.report_wait_times, self.report_wait_times_fieldnames)
@@ -673,7 +674,6 @@ class Simulation(object):
         # Drives
         self.log("Drives: %d/%d (Free/Total)" % (len(free_drives), len(self.drives)), force=True)
 
-
         dic = dict.fromkeys(self.report_drives_fieldnames)
         dic['datetime'] = str(self.simulation.now())
         dic['enabled'] = 0
@@ -697,7 +697,15 @@ class Simulation(object):
         self.log("Cache:      %f %%  %d/%d (Remaining/Total) | (%d, %d) (Files/Dirty)" % (
             util , free/factor, fc.max_capacity/factor, files, dirty), force=True)
 
+
+        # wait-times
+        self.calc_report_waiting([self.processing])
+
+
         pass
+
+
+
 
 
 
@@ -730,3 +738,67 @@ class Simulation(object):
         new_tid = self.tids
         self.tids += 1
         return new_tid
+
+
+
+    def calc_report_waiting(self, lsts):
+        """Wait-statistics for inflight requests"""
+        print("report waiting")
+
+
+        # log only every..
+        self.report_wait_state += 1
+        if self.report_wait_state % 200 != 0:
+            return
+
+
+        dic = dict.fromkeys(self.report_wait_times_fieldnames)
+        dic['1m']   = 0
+        dic['2m']   = 0
+        dic['3m']   = 0
+        dic['4m']   = 0
+        dic['5m']   = 0
+        dic['8m']   = 0
+        dic['10m']  = 0
+        dic['15m']  = 0
+        dic['20m']  = 0
+        dic['30m']  = 0
+        dic['1h']   = 0
+        dic['2h']   = 0
+        dic['4h']   = 0
+        dic['8h']   = 0
+        dic['more'] = 0
+
+
+        for lst in lsts:
+            for req in lst:
+                delta = self.now() - req.time_occur
+                mapping = [
+                   (datetime.timedelta(minutes=1), '1m'),
+                   (datetime.timedelta(minutes=2), '2m'),
+                   (datetime.timedelta(minutes=3), '3m'),
+                   (datetime.timedelta(minutes=4), '4m'),
+                   (datetime.timedelta(minutes=5), '5m'),
+                   (datetime.timedelta(minutes=8), '8m'),
+                   (datetime.timedelta(minutes=10), '10m'),
+                   (datetime.timedelta(minutes=15), '15m'),
+                   (datetime.timedelta(minutes=20), '20m'),
+                   (datetime.timedelta(minutes=30), '30m'),
+                   (datetime.timedelta(hours=1), '1m'),
+                   (datetime.timedelta(hours=2), '2m'),
+                   (datetime.timedelta(hours=4), '3m'),
+                   (datetime.timedelta(hours=8), '4m'),
+                     ]
+
+                for m in mapping:
+                    if delta < m[0]:
+                        dic[m[1]] += 1
+                        break
+
+                print(dic)
+
+
+        dic['datetime'] = str(self.simulation.now())
+        dic['count'] = str(len(lst))
+
+        self.simulation.report.add_report_row(self.report_wait_times, dic)

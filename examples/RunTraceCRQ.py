@@ -139,6 +139,7 @@ def main():
 
 
     parser.add_argument("--debug", help="Be verbose.", action="store_true", default=False)
+    parser.add_argument("--silent", help="Be not verbose.", action="store_true", default=False)
 
 
 

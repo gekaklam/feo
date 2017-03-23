@@ -55,6 +55,7 @@ class Topology(tapesim.components.Component.Component):
         self.nodeswitch = None
         self.driveswitch = None
 
+        self.pos = None
 
         self.pos_dirty = True
 
@@ -316,6 +317,9 @@ class Topology(tapesim.components.Component.Component):
 
         @param output   filepath of desired output file (pdf)
         """
+
+
+        return
 
 
         s = self.simulation
